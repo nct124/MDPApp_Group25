@@ -15,13 +15,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import mdp.cz3004.ntu.com.mdpapp_group25.R;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.Constants;
+import mdp.cz3004.ntu.com.mdpapp_group25.other.MazeCanvas;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.RpiBluetoothService;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String TOAST = "toast";
 
     Toolbar deviceListMenu;
-    TableLayout msgTable;
+    //TableLayout msgTable;
     // Name of the connected device
     private String mConnectedDeviceName = null;
     // Local Bluetooth adapter
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         deviceListMenu = (Toolbar) findViewById(R.id.mainMenu);
         deviceListMenu.setTitle("List of BlueTooth Device");
         setSupportActionBar(deviceListMenu);
-        msgTable = (TableLayout) findViewById(R.id.msgTable);
+        //msgTable = (TableLayout) findViewById(R.id.msgTable);
         Button sendTextBtn = (Button)findViewById(R.id.sendText);
         sendTextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
                 textBox.setText("");
             }
         });
+        MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
+        maze.invalidate();
     }
 
     private void sendText(String text){
@@ -103,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         tr.addView(tv);
-        msgTable.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
+        //msgTable.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
     }
 
 
