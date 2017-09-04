@@ -110,7 +110,12 @@ public class MazeCanvas extends View{
                 }else if(rgIndex==GP){
                     gp = coor;
                 }else if(rgIndex==WP) {
-                    wp = coor;
+                    if(sp!=null &&sp.getCol()==coor.getCol() && sp.getRow()==coor.getRow()){
+                        wp = null;
+                    }else{
+                        wp = coor;
+                    }
+
                 }
                 break;
         }

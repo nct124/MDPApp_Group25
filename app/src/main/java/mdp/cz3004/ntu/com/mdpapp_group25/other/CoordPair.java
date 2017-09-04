@@ -17,11 +17,6 @@ public class CoordPair {
         this.y = y;
     }
 
-    public boolean isPoint(int row, int col){
-        return (this.col==col && this.row==row);
-    }
-
-
     public int getX() {
         return x;
     }
@@ -41,15 +36,12 @@ public class CoordPair {
     public int getRow() {
         return row;
     }
-
     public void setRow(int row) {
         this.row = row;
     }
-
     public int getCol() {
         return col;
     }
-
     public void setCol(int col) {
         this.col = col;
     }
@@ -65,5 +57,9 @@ public class CoordPair {
         int x = col *(grid_width+gap_width);
         int y = row *(grid_width+gap_width);
         return new CoordPair(row,col,x,y);
+    }
+    //starting from 0
+    public int toSingleArray(){
+        return (row*20)+col;
     }
 }
