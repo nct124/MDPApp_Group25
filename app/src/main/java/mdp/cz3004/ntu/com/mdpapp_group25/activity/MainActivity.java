@@ -3,10 +3,12 @@ package mdp.cz3004.ntu.com.mdpapp_group25.activity;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
@@ -15,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,11 +44,14 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter = null;
     // Member object for Bluetooth Command Service
     private RpiBluetoothService mCommandService = null;
+    //context
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mContext = this;
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         // If the adapter is null, then Bluetooth is not supported
@@ -72,6 +78,21 @@ public class MainActivity extends AppCompatActivity {
         });
         MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
         maze.invalidate();
+        RadioGroup rp = (RadioGroup)findViewById(R.id.points);
+        rp.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+                MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
+                if(checkedId==findViewById(R.id.sp_button).getId()){
+                    maze.rgIndex = maze.SP;
+                }else if(checkedId==findViewById(R.id.wp_button).getId()){
+                    maze.rgIndex = maze.WP;
+                }else if(checkedId==findViewById(R.id.gp_button).getId()){
+                    maze.rgIndex = maze.GP;
+                }
+                Toast.makeText(mContext,"index:"+maze.rgIndex,Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void sendText(String text){

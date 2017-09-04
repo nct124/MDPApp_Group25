@@ -46,6 +46,48 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="9"/>
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+                <RadioGroup
+                    android:id="@+id/points"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <RadioButton
+                        android:id="@+id/sp_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:button="@drawable/sp_toggle"
+                        android:text="@null"
+                        android:textOn="@null"
+                        android:textOff="@null"
+                        android:background="@null"
+                        />
+                    <RadioButton
+                        android:id="@+id/wp_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:button="@drawable/wp_toggle"
+                        android:text="@null"
+                        android:textOn="@null"
+                        android:textOff="@null"
+                        android:background="@null"
+                        />
+                    <RadioButton
+                        android:id="@+id/gp_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:button="@drawable/gp_toggle"
+                        android:text="@null"
+                        android:textOn="@null"
+                        android:textOff="@null"
+                        android:background="@null"
+                        />
+                </RadioGroup>
+
+            </LinearLayout>
         </LinearLayout>
 
         <!--<TableLayout
