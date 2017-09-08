@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">MDPApp_Group25</string>
+    <string name="app_name">MDPApp</string>
+    <string name="mdp_key">MDP25</string>
+    <string name="forward">fc</string>
+    <string name="turn_left">lc</string>
+    <string name="turn_right">rc</string>
 </resources>
