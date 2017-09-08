@@ -27,6 +27,8 @@ import mdp.cz3004.ntu.com.mdpapp_group25.other.Constants;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.MazeCanvas;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.RpiBluetoothService;
 
+import static mdp.cz3004.ntu.com.mdpapp_group25.R.id.sendText;
+
 public class MainActivity extends AppCompatActivity {
     // Intent request codes
     private static final int REQUEST_CONNECT_DEVICE = 1;
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         deviceListMenu.setTitle("List of BlueTooth Device");
         setSupportActionBar(deviceListMenu);
         //msgTable = (TableLayout) findViewById(R.id.msgTable);
-        Button sendTextBtn = (Button)findViewById(R.id.sendText);
+        Button sendTextBtn = (Button)findViewById(sendText);
         sendTextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,6 +93,22 @@ public class MainActivity extends AppCompatActivity {
                     maze.rgIndex = maze.GP;
                 }
                 Toast.makeText(mContext,"index:"+maze.rgIndex,Toast.LENGTH_LONG).show();
+            }
+        });
+        Button up = (Button)findViewById(R.id.UpButton);
+        up.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.forward),"FC"));
+            }
+        });
+        Button left = (Button)findViewById(R.id.LeftButton);
+        left.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //SHARED PREFERENCE BUTTON
+                Intent intent = new Intent(mContext, StringCommandsActivity.class);
+                startActivity(intent);
             }
         });
     }
