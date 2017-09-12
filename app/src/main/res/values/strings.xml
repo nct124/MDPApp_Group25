@@ -4,4 +4,8 @@
     <string name="forward">fc</string>
     <string name="turn_left">lc</string>
     <string name="turn_right">rc</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="manual">Manual</string>
+    <string name="log">Status Log</string>
+    <string name="reconfig">String Commands</string>
 </resources>

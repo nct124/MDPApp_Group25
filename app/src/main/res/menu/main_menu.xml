@@ -3,7 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/findBTBtn"
-        android:icon="@drawable/ic_action_name"
-        android:title=""
-        app:showAsAction="ifRoom" />
+        android:title="@string/bluetooth" />
+
+    <item
+        android:id="@+id/manualBtn"
+        android:title="@string/manual" />
+
+    <item
+        android:id="@+id/logBtn"
+        android:title="@string/log" />
+
+    <item
+        android:id="@+id/reconfigBtn"
+        android:title="@string/reconfig" />
 </menu>

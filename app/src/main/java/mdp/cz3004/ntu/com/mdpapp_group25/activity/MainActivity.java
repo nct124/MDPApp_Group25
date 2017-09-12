@@ -16,7 +16,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -85,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
                 MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
+                TextView ctv = (TextView) findViewById(R.id.coorTV);
                 if(checkedId==findViewById(R.id.sp_button).getId()){
                     maze.rgIndex = maze.SP;
                 }else if(checkedId==findViewById(R.id.wp_button).getId()){
@@ -92,23 +96,32 @@ public class MainActivity extends AppCompatActivity {
                 }else if(checkedId==findViewById(R.id.gp_button).getId()){
                     maze.rgIndex = maze.GP;
                 }
+                maze.setTextView(ctv);
                 Toast.makeText(mContext,"index:"+maze.rgIndex,Toast.LENGTH_LONG).show();
             }
         });
-        Button up = (Button)findViewById(R.id.UpButton);
+        ImageButton up = (ImageButton)findViewById(R.id.UpButton);
         up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.forward),"FC"));
+                Toast.makeText(getApplicationContext(), "Forward", Toast.LENGTH_SHORT).show();
             }
         });
-        Button left = (Button)findViewById(R.id.LeftButton);
+        ImageButton left = (ImageButton)findViewById(R.id.LeftButton);
         left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //SHARED PREFERENCE BUTTON
-                Intent intent = new Intent(mContext, StringCommandsActivity.class);
-                startActivity(intent);
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_left),"LC"));
+                Toast.makeText(getApplicationContext(), "Turn Left", Toast.LENGTH_SHORT).show();
+            }
+        });
+        ImageButton right = (ImageButton)findViewById(R.id.RightButton);
+        right.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_right),"RC"));
+                Toast.makeText(getApplicationContext(), "Turn Right", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -194,6 +207,17 @@ public class MainActivity extends AppCompatActivity {
             case R.id.findBTBtn:
                 Intent serverIntent = new Intent(this, BlueToothDeviceListActivity.class);
                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+                return true;
+            case R.id.manualBtn:
+
+                return true;
+            case R.id.logBtn:
+
+                return true;
+            case R.id.reconfigBtn:
+                //SHARED PREFERENCE BUTTON
+                Intent intent = new Intent(mContext, StringCommandsActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -11,7 +11,12 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
+
+import mdp.cz3004.ntu.com.mdpapp_group25.R;
 
 /**
  * Created by n on 1/9/2017.
@@ -30,6 +35,7 @@ public class MazeCanvas extends View{
     public CoordPair sp;
     public CoordPair gp;
     public CoordPair wp;
+    TextView tv;
     private int direction;
     //maze
     private int grid_width;
@@ -92,6 +98,9 @@ public class MazeCanvas extends View{
         }
 
     }
+    public void setTextView(TextView tv) {
+        this.tv = tv;
+    }
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()){
@@ -100,20 +109,25 @@ public class MazeCanvas extends View{
                 int y = (int)event.getY();
                 CoordPair coor = CoordPair.findGrid(x,y,grid_width,gap_width);
                 Toast.makeText(getContext(),"coor:"+coor.getRow()+" "+coor.getCol(),Toast.LENGTH_LONG).show();
+                //TextView ctv = (TextView) findViewById(R.id.coorTV);
+                //ctv.setText(""+coor.getRow()+", "+coor.getCol());
                 if(rgIndex==SP){
                     if(sp!=null &&sp.getCol()==coor.getCol() && sp.getRow()==coor.getRow()){
                         direction = (direction+1)%4;
                     }else{
                         sp = coor;
+                        tv.setText(sp.getRow()+"   "+sp.getCol());
                     }
 
                 }else if(rgIndex==GP){
                     gp = coor;
+                    tv.setText(gp.getRow()+"   "+gp.getCol());
                 }else if(rgIndex==WP) {
                     if(sp!=null &&sp.getCol()==coor.getCol() && sp.getRow()==coor.getRow()){
                         wp = null;
                     }else{
                         wp = coor;
+                        tv.setText(wp.getRow()+"   "+wp.getCol());
                     }
 
                 }

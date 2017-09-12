@@ -7,13 +7,16 @@
     tools:context="mdp.cz3004.ntu.com.mdpapp_group25.activity.MainActivity">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="368dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="8dp"
+        android:id="@+id/linearOne">
         <android.support.v7.widget.Toolbar
             android:id="@+id/mainMenu"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"></android.support.v7.widget.Toolbar>
+            android:layout_height="45dp"></android.support.v7.widget.Toolbar>
 
         <LinearLayout
             android:visibility="gone"
@@ -46,67 +49,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="9"/>
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
-                <RadioGroup
-                    android:id="@+id/points"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <RadioButton
-                        android:id="@+id/sp_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:button="@drawable/sp_toggle"
-                        android:text="@null"
-                        android:textOn="@null"
-                        android:textOff="@null"
-                        android:background="@null"
-                        />
-                    <RadioButton
-                        android:id="@+id/wp_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:button="@drawable/wp_toggle"
-                        android:text="@null"
-                        android:textOn="@null"
-                        android:textOff="@null"
-                        android:background="@null"
-                        />
-                    <RadioButton
-                        android:id="@+id/gp_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:button="@drawable/gp_toggle"
-                        android:text="@null"
-                        android:textOn="@null"
-                        android:textOff="@null"
-                        android:background="@null"
-                        />
-                </RadioGroup>
-                <Button
-                    android:text="Left"
-                    android:id="@+id/LeftButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-                <Button
-                    android:text="Up"
-                    android:id="@+id/UpButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-                <Button
-                    android:text="Right"
-                    android:id="@+id/RightButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
 
         </LinearLayout>
         <!--<TableLayout
@@ -115,5 +57,110 @@
                 android:id="@+id/msgTable">
             </TableLayout>-->
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/relativeOne"
+        app:layout_constraintBottom_toBottomOf="@+id/linearOne">
+        <GridLayout
+            android:id="@+id/gridOne"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnCount="8"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true">
+            <ImageButton
+                android:id="@+id/UpButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/up_arrow"
+                android:layout_row="0"
+                android:layout_column="1"/>
+            <ImageButton
+                android:id="@+id/LeftButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/left_arrow"
+                android:layout_row="1"
+                android:layout_column="0"/>
+            <ImageButton
+                android:id="@+id/RightButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/right_arrow"
+                android:layout_row="1"
+                android:layout_column="2"/>
+    </GridLayout>
+
+        <RadioGroup
+            android:id="@+id/points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_toRightOf="@+id/gridOne">
+            <RadioButton
+                android:id="@+id/sp_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/sp_toggle"
+                android:text="@null"
+                android:textOn="@null"
+                android:textOff="@null"
+                android:background="@null"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="100dp"/>
+            <RadioButton
+                android:id="@+id/gp_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/gp_toggle"
+                android:text="@null"
+                android:textOn="@null"
+                android:textOff="@null"
+                android:background="@null"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="5dp"/>
+            <RadioButton
+                android:id="@+id/wp_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/wp_toggle"
+                android:text="@null"
+                android:textOn="@null"
+                android:textOff="@null"
+                android:background="@null"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="30dp"/>
+
+        </RadioGroup>
+
+        <ImageButton
+            android:id="@+id/updateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/background_light"
+            android:src="@drawable/update"
+            android:layout_marginLeft="287dp"
+            android:layout_marginTop="52dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="155dp"
+            android:text="Coordinates"
+            android:textStyle="bold"
+            android:textAlignment="center" />
+        <TextView
+            android:id="@+id/coorTV"
+            android:layout_width="90dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="148dp"
+            android:layout_marginTop="22dp"
+            android:background="?attr/colorButtonNormal"
+            android:textSize="10pt"
+            android:textAlignment="center" />
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>
