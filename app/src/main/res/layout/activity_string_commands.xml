@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="mdp.cz3004.ntu.com.mdpapp_group25.activity.StringCommandsActivity">
     <RelativeLayout
-        android:layout_width="336dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:layout_editor_absoluteY="0dp"
         tools:layout_editor_absoluteX="8dp">
@@ -23,12 +23,14 @@
                     android:layout_weight="3"
                     android:layout_width="0dp"
                     android:text="Forward:"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"/>
                 <EditText
                     android:id="@+id/UpTxtbox"
                     android:layout_weight="7"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -39,12 +41,14 @@
                     android:layout_weight="3"
                     android:layout_width="0dp"
                     android:text="Left:"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"/>
                 <EditText
                     android:id="@+id/LeftTxtbox"
                     android:layout_weight="7"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp" />
             </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
@@ -55,12 +59,14 @@
                     android:layout_weight="3"
                     android:layout_width="0dp"
                     android:text="Right:"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"/>
                 <EditText
                     android:id="@+id/RightTxtbox"
                     android:layout_weight="7"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"/>
             </LinearLayout>
         </LinearLayout>
         <Button
