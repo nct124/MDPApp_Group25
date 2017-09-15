@@ -46,11 +46,11 @@ public class CoordPair {
         this.col = col;
     }
 
-    public static CoordPair findGrid(int x,int y,int grid_width,int gap_width){
+    public static CoordPair findGrid(int x,int y,int grid_width,int gap_width,int maxrows,int maxcol){
         int col = x/(grid_width+gap_width);
-        int row = y/(grid_width+gap_width);
+        int row = maxrows - Math.abs(y/(grid_width+gap_width))-1;
         int real_x = col *(grid_width+gap_width)+gap_width;
-        int real_y = row *(grid_width+gap_width)+gap_width;
+        int real_y = (grid_width+gap_width)*(maxrows-1-row)+gap_width;//row *(grid_width+gap_width)+gap_width;
         return new CoordPair(row,col,real_x,real_y);
     }
     public static CoordPair findXY(int row,int col,int grid_width,int gap_width){
@@ -60,6 +60,6 @@ public class CoordPair {
     }
     //starting from 0
     public int toSingleArray(){
-        return (row*20)+col;
+        return (row*15)+col;
     }
 }

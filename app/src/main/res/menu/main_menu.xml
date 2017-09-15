@@ -7,7 +7,7 @@
 
     <item
         android:id="@+id/manualBtn"
-        android:title="@string/manual" />
+        android:title="@string/updateMode" />
 
     <item
         android:id="@+id/logBtn"

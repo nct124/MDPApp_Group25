@@ -11,17 +11,14 @@ import android.os.Message;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
+import android.widget.ListView;
 import android.widget.RadioGroup;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +27,6 @@ import mdp.cz3004.ntu.com.mdpapp_group25.other.Constants;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.MazeCanvas;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.RpiBluetoothService;
 
-import static mdp.cz3004.ntu.com.mdpapp_group25.R.id.sendText;
 
 public class MainActivity extends AppCompatActivity {
     // Intent request codes
@@ -41,8 +37,19 @@ public class MainActivity extends AppCompatActivity {
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
 
+    //Auto/Manual
+    Handler updateHandler;
+    int delay = 3000;//millisecond
+    Runnable updateRunnable;
+
+    //incoming/outgoing msg
+    private ArrayAdapter<String> incomingmsg;
+    private ArrayAdapter<String> outgoingmsg;
+
+    //menu
+    Menu menu;
+
     Toolbar deviceListMenu;
-    //TableLayout msgTable;
     // Name of the connected device
     private String mConnectedDeviceName = null;
     // Local Bluetooth adapter
@@ -70,17 +77,6 @@ public class MainActivity extends AppCompatActivity {
         deviceListMenu = (Toolbar) findViewById(R.id.mainMenu);
         deviceListMenu.setTitle("List of BlueTooth Device");
         setSupportActionBar(deviceListMenu);
-        //msgTable = (TableLayout) findViewById(R.id.msgTable);
-        Button sendTextBtn = (Button)findViewById(sendText);
-        sendTextBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText textBox = (EditText)findViewById(R.id.textToBeSent);
-                String txt = textBox.getText().toString();
-                sendText(txt);
-                textBox.setText("");
-            }
-        });
         MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
         maze.invalidate();
         RadioGroup rp = (RadioGroup)findViewById(R.id.points);
@@ -124,9 +120,27 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Turn Right", Toast.LENGTH_SHORT).show();
             }
         });
+
+        updateHandler = new Handler();
+        updateRunnable = new Runnable(){
+            public void run(){
+                //do something
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.send_arena),"SA"));
+                updateHandler.postDelayed(this, delay);
+            }
+        };
+        incomingmsg = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+        outgoingmsg = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+        ListView incomingmsgListView = (ListView) findViewById(R.id.incomingmsg);
+        incomingmsgListView.setAdapter(incomingmsg);
+        ListView outgoingmsgListView = (ListView) findViewById(R.id.outgoingmsg);
+        outgoingmsgListView.setAdapter(outgoingmsg);
+        //String part1 = "FFC07F80FF01FE03FFFFFFF3FFE7FFCFFF9C7F38FE71FCE3F87FF0FFE1FFC3FF87FF0E0E1C1F";
+        //String part2 = "00000100001C80000000001C0000080000060001C00000080000";
+        //maze.updateMaze(part1,part2);
     }
 
-    private void sendText(String text){
+    public void sendText(String text){
         if(mCommandService.getState()!= mCommandService.STATE_CONNECTED){
             Toast.makeText(this,"Not Connected",Toast.LENGTH_LONG).show();
         }else {
@@ -135,31 +149,21 @@ public class MainActivity extends AppCompatActivity {
                 // Get the message bytes and tell the BluetoothChatService to write
                 byte[] send = text.getBytes();
                 mCommandService.write(send);
-                updateTable(text,true);
+                updateLog(text,true);
             }
         }
     }
     private void receiveText(String text){
-        updateTable(text,false);
+        Log.d("MAZE",text);
+        updateLog(text,false);
     }
-    private void updateTable(String text,boolean send){
-        TableRow tr = new TableRow(this);
-        tr.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-        TextView tv = new TextView(this);
-        tv.setText(text);
-        tv.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+    private void updateLog(String text,boolean send){
         if(send){
-            //send
-            tv.setGravity(Gravity.RIGHT);
+            outgoingmsg.add(text);
         }else{
-            //receive
-            tv.setGravity(Gravity.LEFT);
+            incomingmsg.add(text);
         }
-
-        tr.addView(tv);
-        //msgTable.addView(tr, new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
     }
-
 
     // START - DO NOT EDIT
     @Override
@@ -198,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -209,10 +214,26 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
                 return true;
             case R.id.manualBtn:
-
+                if(menu.findItem(R.id.manualBtn).getTitle().equals(getString(R.string.updateMode))){
+                    updateHandler.postDelayed(updateRunnable,delay);
+                    menu.findItem(R.id.manualBtn).setTitle("Auto");
+                }else{
+                    updateHandler.removeCallbacks(updateRunnable);
+                    menu.findItem(R.id.manualBtn).setTitle(getString(R.string.updateMode));
+                }
                 return true;
             case R.id.logBtn:
-
+                if(findViewById(R.id.linearOne).getVisibility()==View.VISIBLE){
+                    findViewById(R.id.linearOne).setVisibility(View.GONE);
+                    findViewById(R.id.relativeOne).setVisibility(View.GONE);
+                    findViewById(R.id.logUI).setVisibility(View.VISIBLE);
+                    menu.findItem(R.id.logBtn).setTitle("MainUI");
+                }else{
+                    findViewById(R.id.linearOne).setVisibility(View.VISIBLE);
+                    findViewById(R.id.relativeOne).setVisibility(View.VISIBLE);
+                    findViewById(R.id.logUI).setVisibility(View.GONE);
+                    menu.findItem(R.id.logBtn).setTitle("Log");
+                }
                 return true;
             case R.id.reconfigBtn:
                 //SHARED PREFERENCE BUTTON
@@ -275,6 +296,7 @@ public class MainActivity extends AppCompatActivity {
                     switch (msg.arg1) {
                         case RpiBluetoothService.STATE_CONNECTED:
                             deviceListMenu.setTitle("Connected to "+mConnectedDeviceName);
+                            updateHandler.postDelayed(updateRunnable, delay);
                             break;
                         case RpiBluetoothService.STATE_CONNECTING:
                             deviceListMenu.setTitle("Connecting..");
@@ -283,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
 
                         case RpiBluetoothService.STATE_NONE:
                             deviceListMenu.setTitle("Not connected to any device");
+                            updateHandler.removeCallbacks(updateRunnable);
                             break;
                     }
                     break;
@@ -301,7 +324,11 @@ public class MainActivity extends AppCompatActivity {
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
+                    //String bin = new BigInteger(readMessage, 16).toString(2);
+                    //bin = bin.substring(0,304);
                     receiveText(readMessage);
+
+
             }
         }
     };

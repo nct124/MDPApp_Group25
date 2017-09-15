@@ -14,9 +14,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
+import java.math.BigInteger;
 
-import mdp.cz3004.ntu.com.mdpapp_group25.R;
+import mdp.cz3004.ntu.com.mdpapp_group25.activity.MainActivity;
 
 /**
  * Created by n on 1/9/2017.
@@ -31,7 +31,7 @@ public class MazeCanvas extends View{
     public static final int GP = 1001;
     public static final int WP = 1002;
     public int rgIndex = -1;
-    private int maze_info;
+    private int[] maze_info;
     public CoordPair sp;
     public CoordPair gp;
     public CoordPair wp;
@@ -58,6 +58,7 @@ public class MazeCanvas extends View{
     public MazeCanvas(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         p = new Paint();
+        maze_info = new int[numColumns*numRows];
     }
 
     @Override
@@ -76,12 +77,18 @@ public class MazeCanvas extends View{
         p.setStyle(Paint.Style.FILL);
         p.setColor(background);
         canvas.drawRect(0,0,getWidth(),getHeight(),p);
-        int y = -grid_width;
+        int y = ((grid_width+gap_width)*numRows)-grid_width;//-grid_width;
         for(int j=0;j<numRows;j++){
-            y +=grid_width+gap_width;
+            y -=grid_width+gap_width;
             int x = -grid_width;
             for(int i=0;i<numColumns;i++){
-                p.setColor(unexplored);
+                if(maze_info[numColumns*j+i]==0){
+                    p.setColor(unexplored);
+                }else if(maze_info[numColumns*j+i]==1){
+                    p.setColor(explored);
+                }else if(maze_info[numColumns*j+i]==2){
+                    p.setColor(obstacle);
+                }
                 x +=grid_width+gap_width;
                 canvas.drawRect(x,y,(x+grid_width),(y+grid_width),p);
                 Log.d("DRAWING",x+" "+y);
@@ -96,7 +103,6 @@ public class MazeCanvas extends View{
         if(wp!=null){
             drawWayPosition(wp,canvas);
         }
-
     }
     public void setTextView(TextView tv) {
         this.tv = tv;
@@ -107,27 +113,28 @@ public class MazeCanvas extends View{
             case MotionEvent.ACTION_UP:
                 int x = (int)event.getX();
                 int y = (int)event.getY();
-                CoordPair coor = CoordPair.findGrid(x,y,grid_width,gap_width);
-                Toast.makeText(getContext(),"coor:"+coor.getRow()+" "+coor.getCol(),Toast.LENGTH_LONG).show();
-                //TextView ctv = (TextView) findViewById(R.id.coorTV);
-                //ctv.setText(""+coor.getRow()+", "+coor.getCol());
+                CoordPair coor = CoordPair.findGrid(x,y,grid_width,gap_width,numRows,numColumns);
+                Toast.makeText(getContext(),"coor:"+coor.getCol()+" "+coor.getRow(),Toast.LENGTH_LONG).show();
                 if(rgIndex==SP){
                     if(sp!=null &&sp.getCol()==coor.getCol() && sp.getRow()==coor.getRow()){
                         direction = (direction+1)%4;
                     }else{
                         sp = coor;
-                        tv.setText(sp.getRow()+"   "+sp.getCol());
+                        tv.setText(sp.getCol()+"   "+sp.getRow());
                     }
-
+                    ((MainActivity)getContext()).sendText("SP:"+sp.getCol()+","+sp.getRow()+","+direction);
                 }else if(rgIndex==GP){
                     gp = coor;
-                    tv.setText(gp.getRow()+"   "+gp.getCol());
+                    tv.setText(gp.getCol()+"   "+gp.getRow());
+                    ((MainActivity)getContext()).sendText("GP:"+gp.getCol()+","+gp.getRow());
                 }else if(rgIndex==WP) {
-                    if(sp!=null &&sp.getCol()==coor.getCol() && sp.getRow()==coor.getRow()){
+                    if(wp!=null &&wp.getCol()==coor.getCol() && wp.getRow()==coor.getRow()){
                         wp = null;
+                        ((MainActivity)getContext()).sendText("WP:null");
                     }else{
                         wp = coor;
-                        tv.setText(wp.getRow()+"   "+wp.getCol());
+                        tv.setText(wp.getCol()+"   "+wp.getRow());
+                        ((MainActivity)getContext()).sendText("WP:"+wp.getCol()+","+wp.getRow());
                     }
 
                 }
@@ -235,5 +242,37 @@ public class MazeCanvas extends View{
         path.close();
 
         canvas.drawPath(path, paint);
+    }
+
+    public void updateMaze(String part1,String part2){
+        String part1bin = new BigInteger(part1, 16).toString(2);
+        int len = 304-part1bin.length();
+        for(int i=0;i<len;i++){
+            part1bin = "0"+part1bin;
+        }
+        String part2bin = new BigInteger(part2, 16).toString(2);
+        len = part2.length()*4-part2bin.length();
+        for(int i=0;i<len;i++){
+            part2bin = "0"+part2bin;
+        }
+        maze_info = new int[numColumns*numRows];
+        int j = 0; //number of bits for part2
+        for(int i=2;i<part1bin.length()-2;i++){
+            maze_info[i-2] += Character.getNumericValue(part1bin.charAt(i));
+            if(maze_info[i-2]==1) {
+                j++;
+            }
+        }
+        int k=0; //index for part2
+        for(int i=2;i<part1bin.length()-2;i++){
+            if(maze_info[i-2]==1){
+                maze_info[i-2] += Character.getNumericValue(part2bin.charAt(k));
+                k++;
+                if(k==j){
+                    break;
+                }
+            }
+        }
+        this.invalidate();
     }
 }
