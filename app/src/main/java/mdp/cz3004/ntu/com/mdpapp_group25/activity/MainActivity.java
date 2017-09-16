@@ -22,6 +22,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import mdp.cz3004.ntu.com.mdpapp_group25.R;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.Constants;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.MazeCanvas;
@@ -85,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
                 MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
                 TextView ctv = (TextView) findViewById(R.id.coorTV);
+                TextView etv = (TextView) findViewById(R.id.errorTV);
                 if(checkedId==findViewById(R.id.sp_button).getId()){
                     maze.rgIndex = maze.SP;
                 }else if(checkedId==findViewById(R.id.wp_button).getId()){
@@ -92,7 +95,8 @@ public class MainActivity extends AppCompatActivity {
                 }else if(checkedId==findViewById(R.id.gp_button).getId()){
                     maze.rgIndex = maze.GP;
                 }
-                maze.setTextView(ctv);
+                maze.setCoorTextView(ctv);
+                maze.setErrorTextView(etv);
                 Toast.makeText(mContext,"index:"+maze.rgIndex,Toast.LENGTH_LONG).show();
             }
         });

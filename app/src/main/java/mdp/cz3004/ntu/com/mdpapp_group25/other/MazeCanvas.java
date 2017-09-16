@@ -35,7 +35,8 @@ public class MazeCanvas extends View{
     public CoordPair sp;
     public CoordPair gp;
     public CoordPair wp;
-    TextView tv;
+    TextView tvOne;
+    TextView tvTwo;
     private int direction;
     //maze
     private int grid_width;
@@ -104,8 +105,11 @@ public class MazeCanvas extends View{
             drawWayPosition(wp,canvas);
         }
     }
-    public void setTextView(TextView tv) {
-        this.tv = tv;
+    public void setCoorTextView(TextView tv) {
+        this.tvOne = tv;
+    }
+    public void setErrorTextView(TextView tv) {
+        this.tvTwo = tv;
     }
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -114,34 +118,52 @@ public class MazeCanvas extends View{
                 int x = (int)event.getX();
                 int y = (int)event.getY();
                 CoordPair coor = CoordPair.findGrid(x,y,grid_width,gap_width,numRows,numColumns);
-                Toast.makeText(getContext(),"coor:"+coor.getCol()+" "+coor.getRow(),Toast.LENGTH_LONG).show();
+                //Toast.makeText(getContext(),"coor:"+coor.getCol()+" "+coor.getRow(),Toast.LENGTH_LONG).show();
                 if(rgIndex==SP){
-                    if(sp!=null &&sp.getCol()==coor.getCol() && sp.getRow()==coor.getRow()){
-                        direction = (direction+1)%4;
-                    }else{
-                        sp = coor;
-                        tv.setText(sp.getCol()+"   "+sp.getRow());
+                    if (validate(coor, gp, wp, rgIndex)) {
+                        tvTwo.setText("");
+                        if (sp != null && sp.getCol() == coor.getCol() && sp.getRow() == coor.getRow()) {
+                            direction = (direction + 1) % 4;
+                        } else {
+                            sp = coor;
+                            tvOne.setText(sp.getCol() + "   " + sp.getRow());
+                        }
+                        ((MainActivity) getContext()).sendText("SP:" + sp.getCol() + "," + sp.getRow() + "," + direction);
                     }
-                    ((MainActivity)getContext()).sendText("SP:"+sp.getCol()+","+sp.getRow()+","+direction);
                 }else if(rgIndex==GP){
-                    gp = coor;
-                    tv.setText(gp.getCol()+"   "+gp.getRow());
-                    ((MainActivity)getContext()).sendText("GP:"+gp.getCol()+","+gp.getRow());
-                }else if(rgIndex==WP) {
-                    if(wp!=null &&wp.getCol()==coor.getCol() && wp.getRow()==coor.getRow()){
-                        wp = null;
-                        ((MainActivity)getContext()).sendText("WP:null");
-                    }else{
-                        wp = coor;
-                        tv.setText(wp.getCol()+"   "+wp.getRow());
-                        ((MainActivity)getContext()).sendText("WP:"+wp.getCol()+","+wp.getRow());
+                    if (validate(coor, sp, wp, rgIndex)) {
+                        tvTwo.setText("");
+                        gp = coor;
+                        tvOne.setText(gp.getCol() + "   " + gp.getRow());
+                        ((MainActivity) getContext()).sendText("GP:" + gp.getCol() + "," + gp.getRow());
                     }
-
+                }else if(rgIndex==WP) {
+                    if (validate(coor, sp, gp, rgIndex)) {
+                        tvTwo.setText("");
+                        if (wp != null && wp.getCol() == coor.getCol() && wp.getRow() == coor.getRow()) {
+                            wp = null;
+                            ((MainActivity) getContext()).sendText("WP:null");
+                        } else {
+                            wp = coor;
+                            tvOne.setText(wp.getCol() + "   " + wp.getRow());
+                            ((MainActivity) getContext()).sendText("WP:" + wp.getCol() + "," + wp.getRow());
+                        }
+                    }
                 }
                 break;
         }
         this.invalidate();
         return true;//super.onTouchEvent(event);
+    }
+    private boolean validate(CoordPair currentPoint, CoordPair coordPairOne, CoordPair coordPairTwo, int index) {
+        if (coordPairOne != null && currentPoint.getCol() == coordPairOne.getCol() && currentPoint.getRow() == coordPairOne.getRow()) {
+            tvTwo.setText("Error: " + index);
+            return false;
+        } else if (coordPairTwo != null && currentPoint.getCol() == coordPairTwo.getCol() && currentPoint.getRow() == coordPairTwo.getRow()) {
+            tvTwo.setText("Error: " + index);
+            return false;
+        }
+        return true;
     }
     private void drawGoalPosition(CoordPair pt,Canvas canvas) {
         p.setColor(goalPoint);
