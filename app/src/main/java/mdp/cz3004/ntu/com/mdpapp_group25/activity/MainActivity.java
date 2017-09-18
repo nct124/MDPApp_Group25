@@ -22,8 +22,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import mdp.cz3004.ntu.com.mdpapp_group25.R;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.Constants;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.MazeCanvas;
@@ -41,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Auto/Manual
     Handler updateHandler;
+    boolean update = false;
     int delay = 3000;//millisecond
     Runnable updateRunnable;
 
@@ -130,7 +129,9 @@ public class MainActivity extends AppCompatActivity {
             public void run(){
                 //do something
                 sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.send_arena),"SA"));
-                updateHandler.postDelayed(this, delay);
+                if(update){
+                    updateHandler.postDelayed(this, delay);
+                }
             }
         };
         incomingmsg = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
@@ -218,12 +219,14 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
                 return true;
             case R.id.manualBtn:
-                if(menu.findItem(R.id.manualBtn).getTitle().equals(getString(R.string.updateMode))){
+                if(update==false){//if(menu.findItem(R.id.manualBtn).getTitle().equals(getString(R.string.updateMode))){
                     updateHandler.postDelayed(updateRunnable,delay);
-                    menu.findItem(R.id.manualBtn).setTitle("Auto");
+                    menu.findItem(R.id.manualBtn).setTitle(getString(R.string.updateMode));
+                    update = true;
                 }else{
                     updateHandler.removeCallbacks(updateRunnable);
-                    menu.findItem(R.id.manualBtn).setTitle(getString(R.string.updateMode));
+                    menu.findItem(R.id.manualBtn).setTitle("Auto");
+                    update = false;
                 }
                 return true;
             case R.id.logBtn:
@@ -301,6 +304,8 @@ public class MainActivity extends AppCompatActivity {
                         case RpiBluetoothService.STATE_CONNECTED:
                             deviceListMenu.setTitle("Connected to "+mConnectedDeviceName);
                             updateHandler.postDelayed(updateRunnable, delay);
+                            update = true;
+                            menu.findItem(R.id.manualBtn).setTitle(getString(R.string.updateMode));
                             break;
                         case RpiBluetoothService.STATE_CONNECTING:
                             deviceListMenu.setTitle("Connecting..");

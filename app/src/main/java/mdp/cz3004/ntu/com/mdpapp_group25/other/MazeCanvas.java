@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.math.BigInteger;
 
@@ -78,7 +77,7 @@ public class MazeCanvas extends View{
         p.setStyle(Paint.Style.FILL);
         p.setColor(background);
         canvas.drawRect(0,0,getWidth(),getHeight(),p);
-        int y = ((grid_width+gap_width)*numRows)-grid_width;//-grid_width;
+        int y = ((grid_width+gap_width)*numRows);//-grid_width;
         for(int j=0;j<numRows;j++){
             y -=grid_width+gap_width;
             int x = -grid_width;
@@ -163,44 +162,98 @@ public class MazeCanvas extends View{
             tvTwo.setText("Error: " + index);
             return false;
         }
+        if(index!=SP){
+            if(coordPairOne!=null &&
+                    ((currentPoint.getRow()==(coordPairOne.getRow()-1)&&currentPoint.getCol()==(coordPairOne.getCol()-1))
+                    ||(currentPoint.getRow()==(coordPairOne.getRow()-1)&&currentPoint.getCol()==(coordPairOne.getCol()))
+                    ||(currentPoint.getRow()==(coordPairOne.getRow()-1)&&currentPoint.getCol()==(coordPairOne.getCol()+1))
+                    ||(currentPoint.getRow()==(coordPairOne.getRow())&&currentPoint.getCol()==(coordPairOne.getCol()-1))
+                    ||(currentPoint.getRow()==(coordPairOne.getRow())&&currentPoint.getCol()==(coordPairOne.getCol()+1))
+                    ||(currentPoint.getRow()==(coordPairOne.getRow()+1)&&currentPoint.getCol()==(coordPairOne.getCol()-1))
+                    ||(currentPoint.getRow()==(coordPairOne.getRow()+1)&&currentPoint.getCol()==(coordPairOne.getCol()))
+                    ||(currentPoint.getRow()==(coordPairOne.getRow()+1)&&currentPoint.getCol()==(coordPairOne.getCol()+1))
+                    )){
+                tvTwo.setText("Error: " + index);
+                return false;
+            }
+        }else {
+            if (coordPairOne != null &&
+                    ((coordPairOne.getRow() == (currentPoint.getRow() - 1) && coordPairOne.getCol() == (currentPoint.getCol() - 1))
+                            || (coordPairOne.getRow() == (currentPoint.getRow() - 1) && coordPairOne.getCol() == (currentPoint.getCol()))
+                            || (coordPairOne.getRow() == (currentPoint.getRow() - 1) && coordPairOne.getCol() == (currentPoint.getCol() + 1))
+                            || (coordPairOne.getRow() == (currentPoint.getRow()) && coordPairOne.getCol() == (currentPoint.getCol() - 1))
+                            || (coordPairOne.getRow() == (currentPoint.getRow()) && coordPairOne.getCol() == (currentPoint.getCol() + 1))
+                            || (coordPairOne.getRow() == (currentPoint.getRow() + 1) && coordPairOne.getCol() == (currentPoint.getCol() - 1))
+                            || (coordPairOne.getRow() == (currentPoint.getRow() + 1) && coordPairOne.getCol() == (currentPoint.getCol()))
+                            || (coordPairOne.getRow() == (currentPoint.getRow() + 1) && coordPairOne.getCol() == (currentPoint.getCol() + 1))
+                    )) {
+                tvTwo.setText("Error: " + index);
+                return false;
+            }
+            if (coordPairTwo != null &&
+                    ((coordPairTwo.getRow() == (currentPoint.getRow() - 1) && coordPairTwo.getCol() == (currentPoint.getCol() - 1))
+                            || (coordPairTwo.getRow() == (currentPoint.getRow() - 1) && coordPairTwo.getCol() == (currentPoint.getCol()))
+                            || (coordPairTwo.getRow() == (currentPoint.getRow() - 1) && coordPairTwo.getCol() == (currentPoint.getCol() + 1))
+                            || (coordPairTwo.getRow() == (currentPoint.getRow()) && coordPairTwo.getCol() == (currentPoint.getCol() - 1))
+                            || (coordPairTwo.getRow() == (currentPoint.getRow()) && coordPairTwo.getCol() == (currentPoint.getCol() + 1))
+                            || (coordPairTwo.getRow() == (currentPoint.getRow() + 1) && coordPairTwo.getCol() == (currentPoint.getCol() - 1))
+                            || (coordPairTwo.getRow() == (currentPoint.getRow() + 1) && coordPairTwo.getCol() == (currentPoint.getCol()))
+                            || (coordPairTwo.getRow() == (currentPoint.getRow() + 1) && coordPairTwo.getCol() == (currentPoint.getCol() + 1))
+                    )) {
+                tvTwo.setText("Error: " + index);
+                return false;
+            }
+        }
+        for(int i=0;i<numRows;i++){
+            if(currentPoint.getRow()==i&&(currentPoint.getCol()==0||currentPoint.getCol()==numColumns-1)){
+                tvTwo.setText("Error: " + index);
+                return false;
+            }
+        }
+        for(int i=0;i<numColumns;i++){
+            if(currentPoint.getCol()==i&&(currentPoint.getRow()==0||currentPoint.getRow()==numRows-1)){
+                tvTwo.setText("Error: " + index);
+                return false;
+            }
+        }
         return true;
     }
     private void drawGoalPosition(CoordPair pt,Canvas canvas) {
         p.setColor(goalPoint);
-        canvas.drawRect(pt.getX(),pt.getY(),(pt.getX()+grid_width),(pt.getY()+grid_width),p);
+        canvas.drawRect(pt.getX(),pt.getY()-gap_width,(pt.getX()+grid_width),(pt.getY()+grid_width-gap_width),p);
     }
     private void drawWayPosition(CoordPair pt,Canvas canvas) {
         p.setColor(wayPoint);
-        canvas.drawRect(pt.getX(),pt.getY(),(pt.getX()+grid_width),(pt.getY()+grid_width),p);
+        canvas.drawRect(pt.getX(),pt.getY()-gap_width,(pt.getX()+grid_width),(pt.getY()+grid_width-gap_width),p);
     }
 	//direction 1(N),2(S),3(E),4(W)
 	private void drawCurrentPosition(CoordPair pt,Canvas canvas,int direction){
         //draw current position
         p.setColor(robot);
-        canvas.drawRect(pt.getX(),pt.getY(),(pt.getX()+grid_width),(pt.getY()+grid_width),p);
+        canvas.drawRect(pt.getX(),pt.getY()-gap_width,(pt.getX()+grid_width),(pt.getY()+grid_width-gap_width),p);
         Point pt1 = new Point();
         Point pt2 = new Point();
         Point pt3 = new Point();
         switch(direction){
             case 0: //N
-                pt1.set(((int)(pt.getX()+((double)grid_width/2))),((int)(pt.getY()+((double)grid_width/100*10))));
-                pt2.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()+((double)grid_width/100*90))));
-                pt3.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()+((double)grid_width/100*90))));
+                pt1.set(((int)(pt.getX()+((double)grid_width/2))),((int)(pt.getY()-gap_width+((double)grid_width/100*10))));
+                pt2.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()-gap_width+((double)grid_width/100*90))));
+                pt3.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()-gap_width+((double)grid_width/100*90))));
                 break;
             case 2: // S
-                pt1.set(((int)(pt.getX()+((double)grid_width/2))),((int)(pt.getY()+((double)grid_width/100*90))));
-                pt2.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()+((double)grid_width/100*10))));
-                pt3.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()+((double)grid_width/100*10))));
+                pt1.set(((int)(pt.getX()+((double)grid_width/2))),((int)(pt.getY()-gap_width+((double)grid_width/100*90))));
+                pt2.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()-gap_width+((double)grid_width/100*10))));
+                pt3.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()-gap_width+((double)grid_width/100*10))));
                 break;
             case 1: //E
-                pt1.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()+((double)grid_width/2))));
-                pt2.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()+((double)grid_width/100*10))));
-                pt3.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()+((double)grid_width/100*90))));
+                pt1.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()-gap_width+((double)grid_width/2))));
+                pt2.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()-gap_width+((double)grid_width/100*10))));
+                pt3.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()-gap_width+((double)grid_width/100*90))));
                 break;
             case 3: //W
-                pt1.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()+((double)grid_width/2))));
-                pt2.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()+((double)grid_width/100*10))));
-                pt3.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()+((double)grid_width/100*90))));
+                pt1.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()-gap_width+((double)grid_width/2))));
+                pt2.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()-gap_width+((double)grid_width/100*10))));
+                pt3.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()-gap_width+((double)grid_width/100*90))));
                 break;
         }
         drawTriangle(pt1,pt2,pt3,canvas);
@@ -208,44 +261,44 @@ public class MazeCanvas extends View{
         //draw surrounding
         p.setColor(robotSurrounding);
         canvas.drawRect(pt.getX()-(grid_width+gap_width),
-                pt.getY()+(grid_width+gap_width),
+                pt.getY()-gap_width+(grid_width+gap_width),
                 (pt.getX()+grid_width-(grid_width+gap_width)),
-                (pt.getY()+grid_width+(grid_width+gap_width))
+                (pt.getY()-gap_width+grid_width+(grid_width+gap_width))
                 ,p);
         canvas.drawRect(pt.getX(),
-                pt.getY()+(grid_width+gap_width),
+                pt.getY()-gap_width+(grid_width+gap_width),
                 (pt.getX()+grid_width),
-                (pt.getY()+grid_width+(grid_width+gap_width))
+                (pt.getY()-gap_width+grid_width+(grid_width+gap_width))
                 ,p);
         canvas.drawRect(pt.getX()+(grid_width+gap_width),
-                pt.getY()+(grid_width+gap_width),
+                pt.getY()-gap_width+(grid_width+gap_width),
                 (pt.getX()+grid_width+(grid_width+gap_width)),
-                (pt.getY()+grid_width+(grid_width+gap_width))
+                (pt.getY()-gap_width+grid_width+(grid_width+gap_width))
                 ,p);
         canvas.drawRect(pt.getX()-(grid_width+gap_width),
-                pt.getY(),
+                pt.getY()-gap_width,
                 (pt.getX()+grid_width-(grid_width+gap_width)),
-                (pt.getY()+grid_width)
+                (pt.getY()-gap_width+grid_width)
                 ,p);
         canvas.drawRect(pt.getX()+(grid_width+gap_width),
-                pt.getY(),
+                pt.getY()-gap_width,
                 (pt.getX()+grid_width+(grid_width+gap_width)),
-                (pt.getY()+grid_width)
+                (pt.getY()-gap_width+grid_width)
                 ,p);
         canvas.drawRect(pt.getX()-(grid_width+gap_width),
-                pt.getY()-(grid_width+gap_width),
+                pt.getY()-gap_width-(grid_width+gap_width),
                 (pt.getX()+grid_width-(grid_width+gap_width)),
-                (pt.getY()+grid_width-(grid_width+gap_width))
+                (pt.getY()-gap_width+grid_width-(grid_width+gap_width))
                 ,p);
         canvas.drawRect(pt.getX(),
-                pt.getY()-(grid_width+gap_width),
+                pt.getY()-gap_width-(grid_width+gap_width),
                 (pt.getX()+grid_width),
-                (pt.getY()+grid_width-(grid_width+gap_width))
+                (pt.getY()-gap_width+grid_width-(grid_width+gap_width))
                 ,p);
         canvas.drawRect(pt.getX()+(grid_width+gap_width),
-                pt.getY()-(grid_width+gap_width),
+                pt.getY()-gap_width-(grid_width+gap_width),
                 (pt.getX()+grid_width+(grid_width+gap_width)),
-                (pt.getY()+grid_width-(grid_width+gap_width))
+                (pt.getY()-gap_width+grid_width-(grid_width+gap_width))
                 ,p);
     }
     private void drawTriangle(Point pt1,Point pt2,Point pt3,Canvas canvas){
