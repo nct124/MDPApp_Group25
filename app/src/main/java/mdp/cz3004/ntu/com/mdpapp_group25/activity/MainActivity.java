@@ -5,9 +5,14 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -30,7 +35,7 @@ import mdp.cz3004.ntu.com.mdpapp_group25.other.MazeCanvas;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.RpiBluetoothService;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
     // Intent request codes
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
@@ -61,6 +66,12 @@ public class MainActivity extends AppCompatActivity {
     private RpiBluetoothService mCommandService = null;
     //context
     private Context mContext;
+
+    // for accelerometer
+    private float xValue, yValue, zValue;
+    private SensorManager sensorManager;
+    private Sensor accelerometer;
+    public Vibrator v;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,6 +162,20 @@ public class MainActivity extends AppCompatActivity {
         //String part1 = "FFC07F80FF01FE03FFFFFFF3FFE7FFCFFF9C7F38FE71FCE3F87FF0FFE1FFC3FF87FF0E0E1C1F";
         //String part2 = "00000100001C80000000001C0000080000060001C00000080000";
         //maze.updateMaze(part1,part2);
+
+        // for accelerometer
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
+            // success! we have an accelerometer
+
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        } else {
+            // fail! we dont have an accelerometer!
+        }
+
+        //initialize vibration
+        v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
     }
 
     public void sendText(String text){
@@ -178,6 +203,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+
+        xValue = sensorEvent.values[0];
+        yValue = sensorEvent.values[1];
+        zValue = sensorEvent.values[2];
+
+        if (yValue < 5 && yValue > 4.75) { //if (yValue > 4.5 && yValue < 5 && zValue > 8.5) {
+            sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.forward),getString(R.string.forward)));
+            v.vibrate(50);
+        }
+        if (xValue > 5 && xValue < 5.25) { //if (xValue > 5 && xValue < 5.5) {
+            sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_left),getString(R.string.turn_left)));
+            v.vibrate(50);
+        }
+        if (xValue < -5 && xValue > -5.25) { //if (xValue < -5 && xValue > -5.5) {
+            sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_right),getString(R.string.turn_right)));
+            v.vibrate(50);
+        }
+
+    }
+
+    // do not delete
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+        // not in use
+    }
+
     // START - DO NOT EDIT
     @Override
     protected void onStart() {
@@ -198,11 +251,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         if (mCommandService != null) {
             if (mCommandService.getState() == RpiBluetoothService.STATE_NONE) {
                 mCommandService.start();
             }
         }
+    }
+
+    //onPause() unregister the accelerometer for stop listening the events
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this);
     }
 
     @Override
@@ -351,7 +411,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     break;
                 //when a msg comes in
-                case Constants.MESSAGE_READ:
+                /*case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
@@ -363,7 +423,7 @@ public class MainActivity extends AppCompatActivity {
                     String status = msgArr[0];
                     ((MazeCanvas)findViewById(R.id.maze)).updateMaze(mdf1,mdf2);
                     ((MazeCanvas)findViewById(R.id.maze)).updateCP(cpcoor,cpdirection);
-                    receiveText(readMessage);
+                    receiveText(readMessage);*/
             }
         }
     };

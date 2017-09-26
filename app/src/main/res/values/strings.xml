@@ -15,4 +15,6 @@
     <string name="log">Log</string>
     <string name="reconfig">String Commands</string>
     <string name="refresh">Refresh</string>
+    <string name="startExplore">Start Explore</string>
+    <string name="startShortestPath">SSP</string>
 </resources>

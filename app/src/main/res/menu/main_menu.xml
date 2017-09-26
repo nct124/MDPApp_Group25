@@ -13,10 +13,10 @@
         android:title="@string/refresh" />
     <item
         android:id="@+id/exploreBtn"
-        android:title="@string/refresh" />
+        android:title="@string/startExplore" />
     <item
         android:id="@+id/sspBtn"
-        android:title="@string/refresh" />
+        android:title="@string/startShortestPath" />
     <item
         android:id="@+id/logBtn"
         android:title="@string/log" />

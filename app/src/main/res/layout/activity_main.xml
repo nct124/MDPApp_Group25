@@ -130,15 +130,6 @@
 
             </RadioGroup>
 
-            <ImageButton
-                android:id="@+id/updateButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@android:color/background_light"
-                android:src="@drawable/update"
-                android:layout_marginLeft="488dp"
-                android:layout_marginTop="52dp"/>
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
