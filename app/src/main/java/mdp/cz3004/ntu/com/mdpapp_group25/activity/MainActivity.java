@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioGroup;
@@ -103,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.forward),"FC"));
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.forward),getString(R.string.forward)));
                 Toast.makeText(getApplicationContext(), "Forward", Toast.LENGTH_SHORT).show();
             }
         });
@@ -111,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_left),"LC"));
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_left),getString(R.string.turn_left)));
                 Toast.makeText(getApplicationContext(), "Turn Left", Toast.LENGTH_SHORT).show();
             }
         });
@@ -119,16 +121,22 @@ public class MainActivity extends AppCompatActivity {
         right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_right),"RC"));
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_right),getString(R.string.turn_right)));
                 Toast.makeText(getApplicationContext(), "Turn Right", Toast.LENGTH_SHORT).show();
             }
         });
-
+        //remove later
+        ((Button)findViewById(R.id.sendTxtBtn)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendText(((EditText)findViewById(R.id.sendTxtbox)).getText().toString());
+            }
+        });
         updateHandler = new Handler();
         updateRunnable = new Runnable(){
             public void run(){
                 //do something
-                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.send_arena),"SA"));
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.request_arena),getString(R.string.request_arena)));
                 if(update){
                     updateHandler.postDelayed(this, delay);
                 }
@@ -150,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this,"Not Connected",Toast.LENGTH_LONG).show();
         }else {
             // Check that there's actually something to send
-            if (text.length() > 0) {
+            if(text.length() > 0) {
                 // Get the message bytes and tell the BluetoothChatService to write
                 byte[] send = text.getBytes();
                 mCommandService.write(send);
@@ -219,13 +227,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
                 return true;
             case R.id.manualBtn:
-                if(update==false){//if(menu.findItem(R.id.manualBtn).getTitle().equals(getString(R.string.updateMode))){
+                if(update==false){//Manual->Auto//if(menu.findItem(R.id.manualBtn).getTitle().equals(getString(R.string.updateMode))){
                     updateHandler.postDelayed(updateRunnable,delay);
                     menu.findItem(R.id.manualBtn).setTitle(getString(R.string.updateMode));
+                    menu.findItem(R.id.refreshBtn).setVisible(false);
                     update = true;
-                }else{
+                }else{//Auto->Manual
                     updateHandler.removeCallbacks(updateRunnable);
                     menu.findItem(R.id.manualBtn).setTitle("Auto");
+                    menu.findItem(R.id.refreshBtn).setVisible(true);
                     update = false;
                 }
                 return true;
@@ -246,6 +256,18 @@ public class MainActivity extends AppCompatActivity {
                 //SHARED PREFERENCE BUTTON
                 Intent intent = new Intent(mContext, StringCommandsActivity.class);
                 startActivity(intent);
+                return true;
+            case R.id.refreshBtn:
+                //manual refresh
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.request_arena),getString(R.string.request_arena)));
+                return true;
+            case R.id.exploreBtn:
+                //manual refresh
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore)));
+                return true;
+            case R.id.sspBtn:
+                //manual refresh
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_shortest),getString(R.string.start_shortest)));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -333,11 +355,15 @@ public class MainActivity extends AppCompatActivity {
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    //String bin = new BigInteger(readMessage, 16).toString(2);
-                    //bin = bin.substring(0,304);
+                    String [] msgArr = readMessage.split(",");
+                    String mdf1 = msgArr[3];
+                    String mdf2 = msgArr[4];
+                    int cpcoor = Integer.parseInt(msgArr[1]);
+                    int cpdirection = Integer.parseInt(msgArr[2]);
+                    String status = msgArr[0];
+                    ((MazeCanvas)findViewById(R.id.maze)).updateMaze(mdf1,mdf2);
+                    ((MazeCanvas)findViewById(R.id.maze)).updateCP(cpcoor,cpdirection);
                     receiveText(readMessage);
-
-
             }
         }
     };

@@ -127,14 +127,14 @@ public class MazeCanvas extends View{
                             sp = coor;
                             tvOne.setText(sp.getCol() + "   " + sp.getRow());
                         }
-                        ((MainActivity) getContext()).sendText("SP:" + sp.getCol() + "," + sp.getRow() + "," + direction);
+                        ((MainActivity) getContext()).sendText("SP:" + sp.toSingleArray() + "," + direction);
                     }
                 }else if(rgIndex==GP){
                     if (validate(coor, sp, wp, rgIndex)) {
                         tvTwo.setText("");
                         gp = coor;
                         tvOne.setText(gp.getCol() + "   " + gp.getRow());
-                        ((MainActivity) getContext()).sendText("GP:" + gp.getCol() + "," + gp.getRow());
+                        ((MainActivity) getContext()).sendText("GP:" + gp.toSingleArray());
                     }
                 }else if(rgIndex==WP) {
                     if (validate(coor, sp, gp, rgIndex)) {
@@ -145,7 +145,7 @@ public class MazeCanvas extends View{
                         } else {
                             wp = coor;
                             tvOne.setText(wp.getCol() + "   " + wp.getRow());
-                            ((MainActivity) getContext()).sendText("WP:" + wp.getCol() + "," + wp.getRow());
+                            ((MainActivity) getContext()).sendText("WP:" + wp.toSingleArray());
                         }
                     }
                 }
@@ -318,7 +318,13 @@ public class MazeCanvas extends View{
 
         canvas.drawPath(path, paint);
     }
+    public void updateCP(int coor,int direction){
+        this.direction = direction;
+        int row = coor/numColumns;
+        int col = coor%numColumns;
+        sp = CoordPair.findXY(row,col,grid_width,gap_width);
 
+    }
     public void updateMaze(String part1,String part2){
         String part1bin = new BigInteger(part1, 16).toString(2);
         int len = 304-part1bin.length();

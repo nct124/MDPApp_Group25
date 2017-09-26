@@ -7,7 +7,7 @@
     tools:context="mdp.cz3004.ntu.com.mdpapp_group25.activity.MainActivity">
 
     <LinearLayout
-        android:layout_width="584dp"
+        android:layout_width="585dp"
         android:layout_height="wrap_content"
         android:id="@+id/mainUI"
         android:orientation="vertical"
@@ -17,7 +17,29 @@
             android:id="@+id/mainMenu"
             android:layout_width="match_parent"
             android:layout_height="50dp"></android.support.v7.widget.Toolbar>
-
+        <LinearLayout
+            android:orientation="horizontal"
+            android:weightSum="10"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="Send:"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:layout_width="0dp"
+                android:layout_weight="8"
+                android:id="@+id/sendTxtbox"
+                android:layout_height="wrap_content" />
+            <Button
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="Send"
+                android:layout_height="wrap_content"
+                android:id="@+id/sendTxtBtn"
+                />
+        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

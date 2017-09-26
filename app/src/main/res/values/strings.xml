@@ -1,13 +1,18 @@
 <resources>
     <string name="app_name">MDPApp</string>
     <string name="mdp_key">MDP25</string>
-    <string name="forward">fc</string>
-    <string name="turn_left">lc</string>
-    <string name="turn_right">rc</string>
-    <string name="send_arena">sa</string>
+    <string name="forward">FC</string>
+    <string name="turn_left">LC</string>
+    <string name="turn_right">RC</string>
+    <string name="back">RB</string>
+    <string name="request_arena">RA</string>
+    <string name="start_explore">STAE</string>
+    <string name="stop_explore">STOE</string>
+    <string name="start_shortest">SSP</string>
 
     <string name="bluetooth">Bluetooth</string>
     <string name="updateMode">Manual</string>
     <string name="log">Log</string>
     <string name="reconfig">String Commands</string>
+    <string name="refresh">Refresh</string>
 </resources>
