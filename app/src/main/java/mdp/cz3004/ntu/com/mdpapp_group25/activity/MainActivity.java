@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     Toolbar deviceListMenu;
     // Name of the connected device
     private String mConnectedDeviceName = null;
+    private String status = "Nil";
     // Local Bluetooth adapter
     private BluetoothAdapter mBluetoothAdapter = null;
     // Member object for Bluetooth Command Service
@@ -68,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Context mContext;
 
     // for accelerometer
+    boolean motion = false;
+    private float xValuesaved, yValuesaved, zValuesaved;
     private float xValue, yValue, zValue;
     private SensorManager sensorManager;
     private Sensor accelerometer;
@@ -116,24 +119,72 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.forward),getString(R.string.forward)));
-                Toast.makeText(getApplicationContext(), "Forward", Toast.LENGTH_SHORT).show();
+                MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
+                if(maze.sp!=null){
+                    int number = maze.sp.toSingleArray();
+                    switch(maze.direction){
+                        case 0://N
+                            number+=15;
+                            break;
+                        case 1://E
+                            number+=1;
+                            break;
+                        case 2://S
+                            number-=15;
+                            break;
+                        case 3://W
+                            number-=1;
+                            break;
+                    }
+                    sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.forward),getString(R.string.forward)));
+                    //maze.updateCP(number,maze.direction);
+                    Toast.makeText(getApplicationContext(), "Forward", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Current position is not set", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
         ImageButton left = (ImageButton)findViewById(R.id.LeftButton);
         left.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_left),getString(R.string.turn_left)));
-                Toast.makeText(getApplicationContext(), "Turn Left", Toast.LENGTH_SHORT).show();
+                MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
+                if(maze.sp!=null){
+                    sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_left),getString(R.string.turn_left)));
+                    //maze.updateCP(maze.sp.toSingleArray(),maze.direction-1);
+                    Toast.makeText(getApplicationContext(), "Turn Left", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Current position is not set", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         ImageButton right = (ImageButton)findViewById(R.id.RightButton);
         right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_right),getString(R.string.turn_right)));
-                Toast.makeText(getApplicationContext(), "Turn Right", Toast.LENGTH_SHORT).show();
+                MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
+                if(maze.sp!=null){
+                    sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_right),getString(R.string.turn_right)));
+                    //maze.updateCP(maze.sp.toSingleArray(),maze.direction+1);
+                    Toast.makeText(getApplicationContext(), "Turn Right", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Current position is not set", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        ImageButton back = (ImageButton)findViewById(R.id.BackButton);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
+                if(maze.sp!=null){
+                    sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.back),getString(R.string.back)));
+                    //maze.updateCP(maze.sp.toSingleArray(),maze.direction+2);
+                    Toast.makeText(getApplicationContext(), "Turn Back", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Current position is not set", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         //remove later
@@ -159,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         incomingmsgListView.setAdapter(incomingmsg);
         ListView outgoingmsgListView = (ListView) findViewById(R.id.outgoingmsg);
         outgoingmsgListView.setAdapter(outgoingmsg);
+
         //String part1 = "FFC07F80FF01FE03FFFFFFF3FFE7FFCFFF9C7F38FE71FCE3F87FF0FFE1FFC3FF87FF0E0E1C1F";
         //String part2 = "00000100001C80000000001C0000080000060001C00000080000";
         //maze.updateMaze(part1,part2);
@@ -209,6 +261,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         xValue = sensorEvent.values[0];
         yValue = sensorEvent.values[1];
         zValue = sensorEvent.values[2];
+        if(motion){
+            float xdiff = xValue-xValuesaved;
+            float ydiff = yValue-yValuesaved;
+            float zdiff = zValue-zValuesaved;
+            if(xdiff<-6){//right
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_right),getString(R.string.turn_right)));
+                v.vibrate(50);
+            }
+            if(xdiff>6){//left
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_left),getString(R.string.turn_left)));
+                v.vibrate(50);
+            }
+            if(zdiff>6){//forward
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.forward),getString(R.string.forward)));
+                v.vibrate(50);
+            }
+        }
+        /*xValue = sensorEvent.values[0];
+        yValue = sensorEvent.values[1];
+        zValue = sensorEvent.values[2];
 
         if (yValue < 5 && yValue > 4.75) { //if (yValue > 4.5 && yValue < 5 && zValue > 8.5) {
             sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.forward),getString(R.string.forward)));
@@ -221,7 +293,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (xValue < -5 && xValue > -5.25) { //if (xValue < -5 && xValue > -5.5) {
             sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_right),getString(R.string.turn_right)));
             v.vibrate(50);
-        }
+        }*/
 
     }
 
@@ -322,12 +394,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.request_arena),getString(R.string.request_arena)));
                 return true;
             case R.id.exploreBtn:
-                //manual refresh
-                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore)));
+                if(menu.findItem(R.id.exploreBtn).getTitle().equals(getString(R.string.startExplore))){//hasnt start exploring
+                    sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore)));
+                    menu.findItem(R.id.exploreBtn).setTitle(getString(R.string.stopExplore));
+                }else{
+                    sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.stop_explore),getString(R.string.stop_explore)));
+                    menu.findItem(R.id.exploreBtn).setTitle(getString(R.string.startExplore));
+                }
+                //menu.findItem(R.id.manualBtn).setTitle("Auto");
+                //sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore)));
                 return true;
             case R.id.sspBtn:
-                //manual refresh
                 sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_shortest),getString(R.string.start_shortest)));
+                return true;
+            case R.id.motionBtn:
+                if(motion==false){
+                    motion = true;
+                    xValuesaved = xValue;
+                    yValuesaved = yValue;
+                    zValuesaved = zValue;
+                    menu.findItem(R.id.motionBtn).setTitle(getString(R.string.controller));
+                }else{
+                    motion = false;
+                    menu.findItem(R.id.motionBtn).setTitle(getString(R.string.motion));
+                }
+                //menu.findItem(R.id.manualBtn).setTitle("Auto");
+                //sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore)));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -384,7 +476,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 case Constants.MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case RpiBluetoothService.STATE_CONNECTED:
-                            deviceListMenu.setTitle("Connected to "+mConnectedDeviceName);
+                            deviceListMenu.setTitle("Status: "+status+"("+mConnectedDeviceName+")");
                             updateHandler.postDelayed(updateRunnable, delay);
                             update = true;
                             menu.findItem(R.id.manualBtn).setTitle(getString(R.string.updateMode));
@@ -411,19 +503,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             Toast.LENGTH_SHORT).show();
                     break;
                 //when a msg comes in
-                /*case Constants.MESSAGE_READ:
+                case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
+                    receiveText(readMessage);
                     String [] msgArr = readMessage.split(",");
                     String mdf1 = msgArr[3];
                     String mdf2 = msgArr[4];
                     int cpcoor = Integer.parseInt(msgArr[1]);
                     int cpdirection = Integer.parseInt(msgArr[2]);
-                    String status = msgArr[0];
+                    status = msgArr[0];
+                    deviceListMenu.setTitle("Status: "+status+"("+mConnectedDeviceName+")");
                     ((MazeCanvas)findViewById(R.id.maze)).updateMaze(mdf1,mdf2);
                     ((MazeCanvas)findViewById(R.id.maze)).updateCP(cpcoor,cpdirection);
-                    receiveText(readMessage);*/
+
+                    break;
             }
         }
     };

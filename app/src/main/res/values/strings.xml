@@ -16,5 +16,8 @@
     <string name="reconfig">String Commands</string>
     <string name="refresh">Refresh</string>
     <string name="startExplore">Start Explore</string>
-    <string name="startShortestPath">SSP</string>
+    <string name="stopExplore">Stop Explore</string>
+    <string name="motion">Motion Mode</string>
+    <string name="controller">Controller Mode</string>
+    <string name="startShortestPath">Start Shortest Path</string>
 </resources>

@@ -53,9 +53,11 @@ public class CoordPair {
         int real_y = (grid_width+gap_width)*(maxrows-1-row)+gap_width;//row *(grid_width+gap_width)+gap_width;
         return new CoordPair(row,col,real_x,real_y);
     }
-    public static CoordPair findXY(int row,int col,int grid_width,int gap_width){
-        int x = col *(grid_width+gap_width);
-        int y = row *(grid_width+gap_width);
+    public static CoordPair findXY(int row,int col,int grid_width,int gap_width,int maxrows,int maxcol){
+        //int x = col *(grid_width+gap_width);
+        //int y = row *(grid_width+gap_width);
+        int x = col *(grid_width+gap_width)+gap_width;
+        int y = (grid_width+gap_width)*(maxrows-1-row)+gap_width;
         return new CoordPair(row,col,x,y);
     }
     //starting from 0

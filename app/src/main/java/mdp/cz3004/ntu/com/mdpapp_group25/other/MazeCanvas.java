@@ -36,7 +36,7 @@ public class MazeCanvas extends View{
     public CoordPair wp;
     TextView tvOne;
     TextView tvTwo;
-    private int direction;
+    public int direction;
     //maze
     private int grid_width;
     private int gap_width = 5;
@@ -226,7 +226,7 @@ public class MazeCanvas extends View{
         p.setColor(wayPoint);
         canvas.drawRect(pt.getX(),pt.getY()-gap_width,(pt.getX()+grid_width),(pt.getY()+grid_width-gap_width),p);
     }
-	//direction 1(N),2(S),3(E),4(W)
+	//direction 0(N),1(S),2(E),3(W)
 	private void drawCurrentPosition(CoordPair pt,Canvas canvas,int direction){
         //draw current position
         p.setColor(robot);
@@ -319,11 +319,17 @@ public class MazeCanvas extends View{
         canvas.drawPath(path, paint);
     }
     public void updateCP(int coor,int direction){
-        this.direction = direction;
+        if(direction<0){
+            this.direction = 3;
+        }else{
+            this.direction = direction%4;
+        }
+
         int row = coor/numColumns;
         int col = coor%numColumns;
-        sp = CoordPair.findXY(row,col,grid_width,gap_width);
-
+        Log.d("CP",coor+" "+row+" "+col);
+        sp = CoordPair.findXY(row,col,grid_width,gap_width,numRows,numColumns);
+        this.invalidate();
     }
     public void updateMaze(String part1,String part2){
         String part1bin = new BigInteger(part1, 16).toString(2);
@@ -335,6 +341,7 @@ public class MazeCanvas extends View{
         len = part2.length()*4-part2bin.length();
         for(int i=0;i<len;i++){
             part2bin = "0"+part2bin;
+            //part2bin = part2bin+"0";
         }
         maze_info = new int[numColumns*numRows];
         int j = 0; //number of bits for part2
