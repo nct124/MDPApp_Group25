@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 TextView ctv = (TextView) findViewById(R.id.coorTV);
                 TextView etv = (TextView) findViewById(R.id.errorTV);
                 if(checkedId==findViewById(R.id.sp_button).getId()){
-                    maze.rgIndex = maze.SP;
+                    maze.rgIndex = maze.CP;
                 }else if(checkedId==findViewById(R.id.wp_button).getId()){
                     maze.rgIndex = maze.WP;
                 }else if(checkedId==findViewById(R.id.gp_button).getId()){
@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             number-=1;
                             break;
                     }
+                    status = "forward";
                     sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.forward),getString(R.string.forward)));
                     //maze.updateCP(number,maze.direction);
                     Toast.makeText(getApplicationContext(), "Forward", Toast.LENGTH_SHORT).show();
@@ -153,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 if(maze.sp!=null){
                     sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_left),getString(R.string.turn_left)));
                     //maze.updateCP(maze.sp.toSingleArray(),maze.direction-1);
+                    status = "turn left";
                     Toast.makeText(getApplicationContext(), "Turn Left", Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(getApplicationContext(), "Current position is not set", Toast.LENGTH_SHORT).show();
@@ -167,13 +169,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 if(maze.sp!=null){
                     sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_right),getString(R.string.turn_right)));
                     //maze.updateCP(maze.sp.toSingleArray(),maze.direction+1);
+                    status = "turn right";
                     Toast.makeText(getApplicationContext(), "Turn Right", Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(getApplicationContext(), "Current position is not set", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        ImageButton back = (ImageButton)findViewById(R.id.BackButton);
+        /*ImageButton back = (ImageButton)findViewById(R.id.BackButton);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -186,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     Toast.makeText(getApplicationContext(), "Current position is not set", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
+        });*/
         //remove later
         ((Button)findViewById(R.id.sendTxtBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -513,7 +516,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     String mdf2 = msgArr[4];
                     int cpcoor = Integer.parseInt(msgArr[1]);
                     int cpdirection = Integer.parseInt(msgArr[2]);
-                    status = msgArr[0];
+                    //status = msgArr[0];
                     deviceListMenu.setTitle("Status: "+status+"("+mConnectedDeviceName+")");
                     ((MazeCanvas)findViewById(R.id.maze)).updateMaze(mdf1,mdf2);
                     ((MazeCanvas)findViewById(R.id.maze)).updateCP(cpcoor,cpdirection);

@@ -26,16 +26,18 @@ public class MazeCanvas extends View{
     private int numColumns = 15;
     private int numRows = 20;
     //info
-    public static final int SP = 1000;
+    public static final int CP = 1000;
     public static final int GP = 1001;
     public static final int WP = 1002;
     public int rgIndex = -1;
     private int[] maze_info;
     public CoordPair sp;
+    public CoordPair cp;
     public CoordPair gp;
     public CoordPair wp;
     TextView tvOne;
     TextView tvTwo;
+    public int startDirection;
     public int direction;
     //maze
     private int grid_width;
@@ -43,15 +45,15 @@ public class MazeCanvas extends View{
     private int canvas_height;
     //Colors
     int background = Color.WHITE;
-    int unexplored = Color.GRAY;
-    int explored = Color.BLUE;
+    int unexplored = Color.DKGRAY;
+    int explored = Color.LTGRAY;
     int obstacle = Color.BLACK;
-    int wayPoint = Color.MAGENTA;
-    int robot = Color.YELLOW;
-    int robotSurrounding = Color.BLUE;
+    int wayPoint = Color.GREEN;
+    int currentPoint = Color.YELLOW;
+    int currentSurrounding = Color.YELLOW;//Color.argb(0,88,216,243);
     int robotDirection = Color.GRAY;
     int goalPoint = Color.RED;
-    int startPoint = Color.GREEN;
+    int startPoint = Color.BLUE;
 
     Paint p;
 
@@ -94,14 +96,18 @@ public class MazeCanvas extends View{
                 Log.d("DRAWING",x+" "+y);
             }
         }
+
         if(sp!=null){
-            drawCurrentPosition(sp,canvas,direction);
+            drawStartPosition(sp,canvas,startDirection);
         }
         if(gp!=null){
             drawGoalPosition(gp,canvas);
         }
         if(wp!=null){
             drawWayPosition(wp,canvas);
+        }
+        if(cp!=null){
+            drawCurrentPosition(cp,canvas,direction);
         }
     }
     public void setCoorTextView(TextView tv) {
@@ -118,26 +124,28 @@ public class MazeCanvas extends View{
                 int y = (int)event.getY();
                 CoordPair coor = CoordPair.findGrid(x,y,grid_width,gap_width,numRows,numColumns);
                 //Toast.makeText(getContext(),"coor:"+coor.getCol()+" "+coor.getRow(),Toast.LENGTH_LONG).show();
-                if(rgIndex==SP){
+                if(rgIndex==CP){
                     if (validate(coor, gp, wp, rgIndex)) {
                         tvTwo.setText("");
-                        if (sp != null && sp.getCol() == coor.getCol() && sp.getRow() == coor.getRow()) {
+                        if (cp != null && cp.getCol() == coor.getCol() && cp.getRow() == coor.getRow()) {
                             direction = (direction + 1) % 4;
+                            startDirection = direction;
                         } else {
+                            cp = coor;
                             sp = coor;
-                            tvOne.setText(sp.getCol() + "   " + sp.getRow());
+                            tvOne.setText(cp.getCol() + "   " + cp.getRow());
                         }
-                        ((MainActivity) getContext()).sendText("SP:" + sp.toSingleArray() + "," + direction);
+                        ((MainActivity) getContext()).sendText("CP:" + cp.toSingleArray() + "," + direction);
                     }
                 }else if(rgIndex==GP){
-                    if (validate(coor, sp, wp, rgIndex)) {
+                    if (validate(coor, cp, wp, rgIndex)) {
                         tvTwo.setText("");
                         gp = coor;
                         tvOne.setText(gp.getCol() + "   " + gp.getRow());
                         ((MainActivity) getContext()).sendText("GP:" + gp.toSingleArray());
                     }
                 }else if(rgIndex==WP) {
-                    if (validate(coor, sp, gp, rgIndex)) {
+                    if (validate(coor, cp, gp, rgIndex)) {
                         tvTwo.setText("");
                         if (wp != null && wp.getCol() == coor.getCol() && wp.getRow() == coor.getRow()) {
                             wp = null;
@@ -162,7 +170,7 @@ public class MazeCanvas extends View{
             tvTwo.setText("Error: " + index);
             return false;
         }
-        if(index!=SP){
+        if(index!=CP){
             if(coordPairOne!=null &&
                     ((currentPoint.getRow()==(coordPairOne.getRow()-1)&&currentPoint.getCol()==(coordPairOne.getCol()-1))
                     ||(currentPoint.getRow()==(coordPairOne.getRow()-1)&&currentPoint.getCol()==(coordPairOne.getCol()))
@@ -226,10 +234,40 @@ public class MazeCanvas extends View{
         p.setColor(wayPoint);
         canvas.drawRect(pt.getX(),pt.getY()-gap_width,(pt.getX()+grid_width),(pt.getY()+grid_width-gap_width),p);
     }
+    private void drawStartPosition(CoordPair pt,Canvas canvas,int direction) {
+        p.setColor(startPoint);
+        canvas.drawRect(pt.getX(),pt.getY()-gap_width,(pt.getX()+grid_width),(pt.getY()+grid_width-gap_width),p);
+        Point pt1 = new Point();
+        Point pt2 = new Point();
+        Point pt3 = new Point();
+        switch(direction){
+            case 0: //N
+                pt1.set(((int)(pt.getX()+((double)grid_width/2))),((int)(pt.getY()-gap_width+((double)grid_width/100*10))));
+                pt2.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()-gap_width+((double)grid_width/100*90))));
+                pt3.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()-gap_width+((double)grid_width/100*90))));
+                break;
+            case 2: // S
+                pt1.set(((int)(pt.getX()+((double)grid_width/2))),((int)(pt.getY()-gap_width+((double)grid_width/100*90))));
+                pt2.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()-gap_width+((double)grid_width/100*10))));
+                pt3.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()-gap_width+((double)grid_width/100*10))));
+                break;
+            case 1: //E
+                pt1.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()-gap_width+((double)grid_width/2))));
+                pt2.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()-gap_width+((double)grid_width/100*10))));
+                pt3.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()-gap_width+((double)grid_width/100*90))));
+                break;
+            case 3: //W
+                pt1.set(((int)(pt.getX()+((double)grid_width/100*10))),((int)(pt.getY()-gap_width+((double)grid_width/2))));
+                pt2.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()-gap_width+((double)grid_width/100*10))));
+                pt3.set(((int)(pt.getX()+((double)grid_width/100*90))),((int)(pt.getY()-gap_width+((double)grid_width/100*90))));
+                break;
+        }
+        drawTriangle(pt1,pt2,pt3,canvas);
+    }
 	//direction 0(N),1(S),2(E),3(W)
 	private void drawCurrentPosition(CoordPair pt,Canvas canvas,int direction){
         //draw current position
-        p.setColor(robot);
+        p.setColor(currentPoint);
         canvas.drawRect(pt.getX(),pt.getY()-gap_width,(pt.getX()+grid_width),(pt.getY()+grid_width-gap_width),p);
         Point pt1 = new Point();
         Point pt2 = new Point();
@@ -259,7 +297,7 @@ public class MazeCanvas extends View{
         drawTriangle(pt1,pt2,pt3,canvas);
 
         //draw surrounding
-        p.setColor(robotSurrounding);
+        p.setColor(currentSurrounding);
         canvas.drawRect(pt.getX()-(grid_width+gap_width),
                 pt.getY()-gap_width+(grid_width+gap_width),
                 (pt.getX()+grid_width-(grid_width+gap_width)),
@@ -328,7 +366,7 @@ public class MazeCanvas extends View{
         int row = coor/numColumns;
         int col = coor%numColumns;
         Log.d("CP",coor+" "+row+" "+col);
-        sp = CoordPair.findXY(row,col,grid_width,gap_width,numRows,numColumns);
+        cp = CoordPair.findXY(row,col,grid_width,gap_width,numRows,numColumns);
         this.invalidate();
     }
     public void updateMaze(String part1,String part2){
