@@ -10,9 +10,7 @@
         android:layout_width="585dp"
         android:layout_height="wrap_content"
         android:id="@+id/mainUI"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="8dp">
+        android:orientation="vertical">
         <android.support.v7.widget.Toolbar
             android:id="@+id/mainMenu"
             android:layout_width="match_parent"
@@ -20,6 +18,7 @@
         <LinearLayout
             android:orientation="horizontal"
             android:weightSum="10"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
@@ -50,7 +49,7 @@
                 android:id="@+id/maze"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="9"/>
+                android:layout_weight="10"/>
         </LinearLayout>
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -86,13 +85,13 @@
                     android:src="@drawable/right_arrow"
                     android:layout_row="1"
                     android:layout_column="2"/>
-                <!--<ImageButton
+                <ImageButton
                     android:id="@+id/BackButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/down_arrow"
                     android:layout_row="1"
-                    android:layout_column="1"/>-->
+                    android:layout_column="1"/>
             </GridLayout>
 
             <RadioGroup
@@ -110,8 +109,8 @@
                     android:textOn="@null"
                     android:textOff="@null"
                     android:background="@null"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginRight="10dp"/>
+                    android:layout_marginTop="42dp"
+                    android:layout_marginRight="8dp"/>
                 <RadioButton
                     android:id="@+id/gp_button"
                     android:layout_width="wrap_content"
@@ -121,7 +120,7 @@
                     android:textOn="@null"
                     android:textOff="@null"
                     android:background="@null"
-                    android:layout_marginRight="10dp"
+                    android:layout_marginRight="8dp"
                     android:layout_marginTop="5dp"/>
                 <RadioButton
                     android:id="@+id/wp_button"
@@ -133,7 +132,7 @@
                     android:textOff="@null"
                     android:background="@null"
                     android:layout_marginRight="10dp"
-                    android:layout_marginTop="30dp"/>
+                    android:layout_marginTop="42dp"/>
 
             </RadioGroup>
 
@@ -168,6 +167,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/logUI"
+            android:visibility="gone"
             android:layout_weight="10"
             android:orientation="vertical">
             <TextView

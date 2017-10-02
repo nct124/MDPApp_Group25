@@ -1,10 +1,12 @@
 package mdp.cz3004.ntu.com.mdpapp_group25.activity;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     //Auto/Manual
     Handler updateHandler;
     boolean update = false;
-    int delay = 3000;//millisecond
+    int delay = 500;//millisecond
     Runnable updateRunnable;
 
     //incoming/outgoing msg
@@ -176,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
         });
-        /*ImageButton back = (ImageButton)findViewById(R.id.BackButton);
+        ImageButton back = (ImageButton)findViewById(R.id.BackButton);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -189,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     Toast.makeText(getApplicationContext(), "Current position is not set", Toast.LENGTH_SHORT).show();
                 }
             }
-        });*/
+        });
         //remove later
         ((Button)findViewById(R.id.sendTxtBtn)).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -246,6 +248,41 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         }
     }
+    /*public void sendText(String text,boolean hex){
+        if(mCommandService.getState()!= mCommandService.STATE_CONNECTED){
+            Toast.makeText(this,"Not Connected",Toast.LENGTH_LONG).show();
+        }else {
+            // Check that there's actually something to send
+            if(text.length() > 0) {
+
+                // Get the message bytes and tell the BluetoothChatService to write
+                byte[] send;
+                if(hex){
+                    Integer hexvalue = Integer.decode(text);
+                    Log.d("send",Integer.toString(hexvalue));
+                    //send = hexvalue.byteValue();
+                }else{
+                    Log.d("send",text);
+                }
+                //send= text.getBytes();
+                //mCommandService.write(send);
+                //updateLog(text,true);
+            }
+        }
+    }*/
+    /*public void sendText(int hex){
+        if(mCommandService.getState()!= mCommandService.STATE_CONNECTED){
+            Toast.makeText(this,"Not Connected",Toast.LENGTH_LONG).show();
+        }else {
+            // Check that there's actually something to send
+            if(text.length() > 0) {
+                // Get the message bytes and tell the BluetoothChatService to write
+                byte[] send = text.getBytes();
+                mCommandService.write(send);
+                updateLog(text,true);
+            }
+        }
+    }*/
     private void receiveText(String text){
         Log.d("MAZE",text);
         updateLog(text,false);
@@ -256,6 +293,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }else{
             incomingmsg.add(text);
         }
+    }
+    public void setStatus(String text){
+        if(text.equals("COLLISION ")){
+            deviceListMenu.setTitleTextColor(Color.RED);
+        }else{
+            deviceListMenu.setTitleTextColor(Color.BLACK);
+        }
+        status = text;
+        deviceListMenu.setTitle("Status: "+status+"("+mConnectedDeviceName+")");
     }
 
     @Override
@@ -410,6 +456,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             case R.id.sspBtn:
                 sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_shortest),getString(R.string.start_shortest)));
                 return true;
+            case R.id.sendTextDialogBtn:
+                final Dialog dialog = new Dialog(mContext);
+                dialog.setContentView(R.layout.sendtextlayout);
+                dialog.setTitle("Send Text:");
+                Button dialogButton = (Button) dialog.findViewById(R.id.dialog_sendTextBtn);
+                // if button is clicked, close the custom dialog
+                dialogButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EditText text = (EditText)dialog.findViewById(R.id.dialog_sendText);
+                        sendText(text.getText().toString());
+                    }
+                });
+                dialog.show();
+                return true;
             case R.id.motionBtn:
                 if(motion==false){
                     motion = true;
@@ -512,15 +573,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     receiveText(readMessage);
                     String [] msgArr = readMessage.split(",");
-                    String mdf1 = msgArr[3];
-                    String mdf2 = msgArr[4];
-                    int cpcoor = Integer.parseInt(msgArr[1]);
-                    int cpdirection = Integer.parseInt(msgArr[2]);
-                    //status = msgArr[0];
-                    deviceListMenu.setTitle("Status: "+status+"("+mConnectedDeviceName+")");
-                    ((MazeCanvas)findViewById(R.id.maze)).updateMaze(mdf1,mdf2);
-                    ((MazeCanvas)findViewById(R.id.maze)).updateCP(cpcoor,cpdirection);
-
+                    boolean fullinfo = true;
+                    for(int i=0;i<msgArr.length;i++){
+                        if(msgArr[i].equals("")){
+                            fullinfo = false;
+                            break;
+                        }
+                    }
+                    if(fullinfo){
+                        String mdf1 = msgArr[3];
+                        String mdf2 = msgArr[4];
+                        int cpcoor = Integer.parseInt(msgArr[1]);
+                        int cpdirection = Integer.parseInt(msgArr[2]);
+                        //status = msgArr[0];
+                        setStatus(status);
+                        //deviceListMenu.setTitle("Status: "+status+"("+mConnectedDeviceName+")");
+                        ((MazeCanvas)findViewById(R.id.maze)).updateMaze(mdf1,mdf2);
+                        ((MazeCanvas)findViewById(R.id.maze)).updateCP(cpcoor,cpdirection);
+                    }
                     break;
             }
         }

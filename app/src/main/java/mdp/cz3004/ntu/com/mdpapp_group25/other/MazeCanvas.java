@@ -66,11 +66,14 @@ public class MazeCanvas extends View{
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        grid_width = (getWidth()-(gap_width*(numColumns+1)))/numColumns;
-        canvas_height = (grid_width*numRows)+((numRows+1)*gap_width);
+        grid_width = (getWidth()-(gap_width*(numColumns+2)))/(numColumns+1); //(getWidth()-(gap_width*(numColumns+1)))/numColumns;
+        canvas_height = (grid_width*numRows)+((numRows+2)*gap_width)+(grid_width+gap_width)-25;//(grid_width*numRows)+((numRows+1)*gap_width);
         Log.d("SIZE",getWidth()+" "+getHeight()+" "+(grid_width*numColumns+gap_width*(numColumns+1)));
         getLayoutParams().height = canvas_height;
+        this.sp = CoordPair.findXY(1,1,grid_width,gap_width,numRows,numColumns);
+        this.cp = CoordPair.findXY(1,1,grid_width,gap_width,numRows,numColumns);
         requestLayout();
+
     }
 
     @Override
@@ -79,10 +82,15 @@ public class MazeCanvas extends View{
         p.setStyle(Paint.Style.FILL);
         p.setColor(background);
         canvas.drawRect(0,0,getWidth(),getHeight(),p);
+        p.setColor(Color.BLACK);
+        p.setTextSize(40);
+        //canvas.drawText(Integer.toString(0),(float)50,(float)50,p);
         int y = ((grid_width+gap_width)*numRows);//-grid_width;
+        //int yforColNum = ((grid_width+gap_width)*(numRows+1)-20);
+
         for(int j=0;j<numRows;j++){
             y -=grid_width+gap_width;
-            int x = -grid_width;
+            int x = -grid_width+(grid_width+gap_width);
             for(int i=0;i<numColumns;i++){
                 if(maze_info[numColumns*j+i]==0){
                     p.setColor(unexplored);
@@ -93,7 +101,26 @@ public class MazeCanvas extends View{
                 }
                 x +=grid_width+gap_width;
                 canvas.drawRect(x,y,(x+grid_width),(y+grid_width),p);
-                Log.d("DRAWING",x+" "+y);
+            }
+        }
+        int xforRowNum = -grid_width;
+        y = ((grid_width+gap_width)*numRows);
+        for(int j=0;j<numRows;j++){
+            y -=grid_width+gap_width;
+            if(j>9){
+                canvas.drawText(Integer.toString(j),(float)xforRowNum+45,(float)y+(grid_width)-10,p);
+            }else{
+                canvas.drawText(Integer.toString(j),(float)xforRowNum+65,(float)y+(grid_width)-10,p);
+            }
+        }
+        int yforColNum = ((grid_width+gap_width)*(numRows+1)-20);
+        int x = -grid_width+(grid_width+gap_width);
+        for(int i=0;i<numColumns;i++){
+            x +=grid_width+gap_width;
+            if(i>9){
+                canvas.drawText(Integer.toString(i),(float)x,(float)yforColNum,p);
+            }else{
+                canvas.drawText(Integer.toString(i),(float)x+10,(float)yforColNum,p);
             }
         }
 
@@ -363,10 +390,19 @@ public class MazeCanvas extends View{
             this.direction = direction%4;
         }
 
-        int row = coor/numColumns;
-        int col = coor%numColumns;
+        int row = (coor/numColumns);
+        int col = (coor%numColumns);
+
         Log.d("CP",coor+" "+row+" "+col);
         cp = CoordPair.findXY(row,col,grid_width,gap_width,numRows,numColumns);
+        for(int i=-1;i<2;i++){//row
+            for(int j=-1;j<2;j++) {//col
+                int index = cp.toSingleArray()+(j)+(i*numColumns);
+                if (maze_info[index]==2){
+                    ((MainActivity) getContext()).setStatus("COLLISION ");
+                }
+            }
+        }
         this.invalidate();
     }
     public void updateMaze(String part1,String part2){

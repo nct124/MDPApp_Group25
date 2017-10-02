@@ -1,5 +1,7 @@
 package mdp.cz3004.ntu.com.mdpapp_group25.other;
 
+import android.util.Log;
+
 /**
  * Created by n on 4/9/2017.
  */
@@ -47,16 +49,17 @@ public class CoordPair {
     }
 
     public static CoordPair findGrid(int x,int y,int grid_width,int gap_width,int maxrows,int maxcol){
-        int col = x/(grid_width+gap_width);
+        int col = (x/(grid_width+gap_width))-1;
         int row = maxrows - Math.abs(y/(grid_width+gap_width))-1;
-        int real_x = col *(grid_width+gap_width)+gap_width;
+        Log.d("coorCP",col+" "+row);
+        int real_x = (col+1) *(grid_width+gap_width)+gap_width;
         int real_y = (grid_width+gap_width)*(maxrows-1-row)+gap_width;//row *(grid_width+gap_width)+gap_width;
         return new CoordPair(row,col,real_x,real_y);
     }
     public static CoordPair findXY(int row,int col,int grid_width,int gap_width,int maxrows,int maxcol){
         //int x = col *(grid_width+gap_width);
         //int y = row *(grid_width+gap_width);
-        int x = col *(grid_width+gap_width)+gap_width;
+        int x = (col+1) *(grid_width+gap_width)+gap_width;
         int y = (grid_width+gap_width)*(maxrows-1-row)+gap_width;
         return new CoordPair(row,col,x,y);
     }

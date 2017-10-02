@@ -27,4 +27,7 @@
     <item
         android:id="@+id/reconfigBtn"
         android:title="@string/reconfig" />
+    <item
+        android:id="@+id/sendTextDialogBtn"
+        android:title="@string/sendTextDialog" />
 </menu>

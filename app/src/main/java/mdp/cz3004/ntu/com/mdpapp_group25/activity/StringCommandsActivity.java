@@ -29,7 +29,7 @@ public class StringCommandsActivity extends AppCompatActivity {
         WindowManager.LayoutParams params = getWindow().getAttributes();
         params.x = -20;
         params.height = height/2;
-        params.width = width/2;
+        params.width = width;
         params.y = -10;
         this.getWindow().setAttributes(params);
 
