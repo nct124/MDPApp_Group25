@@ -23,8 +23,8 @@
     <string name="log">Log</string>
     <string name="reconfig">String Commands</string>
     <string name="refresh">Refresh</string>
-    <string name="startExplore">Start Explore</string>
-    <string name="stopExplore">Stop Explore</string>
+    <string name="startExplore">STAE</string>
+    <string name="stopExplore">STOE</string>
     <string name="motion">Motion Mode</string>
     <string name="controller">Controller Mode</string>
     <string name="startShortestPath">Start Shortest Path</string>

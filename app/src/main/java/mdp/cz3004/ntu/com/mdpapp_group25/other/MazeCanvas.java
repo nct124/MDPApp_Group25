@@ -162,25 +162,25 @@ public class MazeCanvas extends View{
                             sp = coor;
                             tvOne.setText(cp.getCol() + "   " + cp.getRow());
                         }
-                        ((MainActivity) getContext()).sendText("CP:" + cp.toSingleArray() + "," + direction);
+                        ((MainActivity) getContext()).sendText("ALGO:CP:" + cp.toSingleArray() + "," + direction);
                     }
                 }else if(rgIndex==GP){
                     if (validate(coor, cp, wp, rgIndex)) {
                         tvTwo.setText("");
                         gp = coor;
                         tvOne.setText(gp.getCol() + "   " + gp.getRow());
-                        ((MainActivity) getContext()).sendText("GP:" + gp.toSingleArray());
+                        ((MainActivity) getContext()).sendText("ALGO:GP:" + gp.toSingleArray());
                     }
                 }else if(rgIndex==WP) {
                     if (validate(coor, cp, gp, rgIndex)) {
                         tvTwo.setText("");
                         if (wp != null && wp.getCol() == coor.getCol() && wp.getRow() == coor.getRow()) {
                             wp = null;
-                            ((MainActivity) getContext()).sendText("WP:null");
+                            ((MainActivity) getContext()).sendText("ALGO:WP:null");
                         } else {
                             wp = coor;
                             tvOne.setText(wp.getCol() + "   " + wp.getRow());
-                            ((MainActivity) getContext()).sendText("WP:" + wp.toSingleArray());
+                            ((MainActivity) getContext()).sendText("ALGO:WP:" + wp.toSingleArray());
                         }
                     }
                 }

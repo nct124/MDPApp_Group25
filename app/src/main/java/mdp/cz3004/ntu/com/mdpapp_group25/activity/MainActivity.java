@@ -24,12 +24,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import mdp.cz3004.ntu.com.mdpapp_group25.R;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.Constants;
@@ -203,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         updateRunnable = new Runnable(){
             public void run(){
                 //do something
-                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.request_arena),getString(R.string.request_arena)));
+                //sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.request_arena),getString(R.string.request_arena)));
                 if(update){
                     updateHandler.postDelayed(this, delay);
                 }
@@ -233,6 +235,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         //initialize vibration
         v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+
+        ToggleButton tb = (ToggleButton)findViewById(R.id.toggleSE);
+        tb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
+                    sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore))+":"+maze.cp.toSingleArray()+":"+maze.direction);
+                }else{
+                    MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
+                    sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore))+":"+maze.cp.toSingleArray()+":"+maze.direction);
+                }
+            }
+        });
     }
 
     public void sendText(String text){
@@ -444,7 +460,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 return true;
             case R.id.exploreBtn:
                 if(menu.findItem(R.id.exploreBtn).getTitle().equals(getString(R.string.startExplore))){//hasnt start exploring
-                    sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore)));
+                    MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
+                    sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore))+":"+maze.cp.toSingleArray()+":"+maze.direction);
                     menu.findItem(R.id.exploreBtn).setTitle(getString(R.string.stopExplore));
                 }else{
                     sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.stop_explore),getString(R.string.stop_explore)));
@@ -572,25 +589,42 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     receiveText(readMessage);
-                    String [] msgArr = readMessage.split(",");
-                    boolean fullinfo = true;
-                    for(int i=0;i<msgArr.length;i++){
-                        if(msgArr[i].equals("")){
-                            fullinfo = false;
-                            break;
+                    try{
+                        String [] msgArr = readMessage.split(":");
+                        if(msgArr[0].equalsIgnoreCase("MAP")){
+                            String mdf1 = msgArr[1];//msgArr[3];
+                            String mdf2 = msgArr[2];//msgArr[4];
+                            ((MazeCanvas)findViewById(R.id.maze)).updateMaze(mdf1,mdf2);
+                        }else if(msgArr[0].equalsIgnoreCase("SP")){
+                            int cpcoor = Integer.parseInt(msgArr[1]);
+                            int cpdirection = Integer.parseInt(msgArr[2]);
+                            ((MazeCanvas)findViewById(R.id.maze)).updateCP(cpcoor,cpdirection);
                         }
+                    }catch(Exception ex){
+                        Toast.makeText(mContext,"SIAO LIAO",Toast.LENGTH_LONG).show();
                     }
-                    if(fullinfo){
-                        String mdf1 = msgArr[3];
-                        String mdf2 = msgArr[4];
-                        int cpcoor = Integer.parseInt(msgArr[1]);
-                        int cpdirection = Integer.parseInt(msgArr[2]);
-                        //status = msgArr[0];
-                        setStatus(status);
-                        //deviceListMenu.setTitle("Status: "+status+"("+mConnectedDeviceName+")");
-                        ((MazeCanvas)findViewById(R.id.maze)).updateMaze(mdf1,mdf2);
-                        ((MazeCanvas)findViewById(R.id.maze)).updateCP(cpcoor,cpdirection);
-                    }
+
+                    /*if(readMessage.equals("")==false){
+                        String [] msgArr = readMessage.split(":");
+                        boolean fullinfo = true;
+                        for(int i=0;i<msgArr.length;i++){
+                            if(msgArr[i].equals("")){
+                                fullinfo = false;
+                                break;
+                            }
+                        }
+                        if(fullinfo){
+                            String mdf1 = msgArr[0];//msgArr[3];
+                            String mdf2 = msgArr[1];//msgArr[4];
+                            int cpcoor = Integer.parseInt(msgArr[2]);//Integer.parseInt(msgArr[1]);
+                            int cpdirection = Integer.parseInt(msgArr[3]);//Integer.parseInt(msgArr[2]);
+                            //status = msgArr[0];
+                            setStatus(status);
+                            //deviceListMenu.setTitle("Status: "+status+"("+mConnectedDeviceName+")");
+                            ((MazeCanvas)findViewById(R.id.maze)).updateMaze(mdf1,mdf2);
+                            ((MazeCanvas)findViewById(R.id.maze)).updateCP(cpcoor,cpdirection);
+                        }
+                    }*/
                     break;
             }
         }

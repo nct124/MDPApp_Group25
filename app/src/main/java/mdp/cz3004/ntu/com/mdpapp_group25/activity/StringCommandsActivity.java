@@ -59,7 +59,7 @@ public class StringCommandsActivity extends AppCompatActivity {
                 EditText left = (EditText)findViewById(R.id.LeftTxtbox);
                 EditText right = (EditText)findViewById(R.id.RightTxtbox);
                 EditText back = (EditText)findViewById(R.id.BackTxtbox);
-                EditText sa = (EditText)findViewById(R.id.StartExploreTxtbox);
+                EditText sa = (EditText)findViewById(R.id.RequestArenaTxtbox);
                 EditText stae = (EditText)findViewById(R.id.StartExploreTxtbox);
                 EditText stoe = (EditText)findViewById(R.id.StopExploreTxtbox);
                 EditText ssp = (EditText)findViewById(R.id.StartShortestPathTxtbox);
