@@ -70,8 +70,10 @@ public class MazeCanvas extends View{
         canvas_height = (grid_width*numRows)+((numRows+2)*gap_width)+(grid_width+gap_width)-25;//(grid_width*numRows)+((numRows+1)*gap_width);
         Log.d("SIZE",getWidth()+" "+getHeight()+" "+(grid_width*numColumns+gap_width*(numColumns+1)));
         getLayoutParams().height = canvas_height;
+        this.gp = CoordPair.findXY(18,13,grid_width,gap_width,numRows,numColumns);
         this.sp = CoordPair.findXY(1,1,grid_width,gap_width,numRows,numColumns);
         this.cp = CoordPair.findXY(1,1,grid_width,gap_width,numRows,numColumns);
+
         requestLayout();
 
     }

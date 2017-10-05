@@ -24,14 +24,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import mdp.cz3004.ntu.com.mdpapp_group25.R;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.Constants;
@@ -236,17 +234,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //initialize vibration
         v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
 
-        ToggleButton tb = (ToggleButton)findViewById(R.id.toggleSE);
-        tb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        Button seb = (Button)findViewById(R.id.buttonSE);
+        seb.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
-                    sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore))+":"+maze.cp.toSingleArray()+":"+maze.direction);
-                }else{
-                    MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
-                    sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore))+":"+maze.cp.toSingleArray()+":"+maze.direction);
-                }
+            public void onClick(View v) {
+                MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore))+":"+maze.cp.toSingleArray()+":"+maze.direction);
+            }
+        });
+        Button sspb = (Button)findViewById(R.id.buttonSSP);
+        sspb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_shortest),getString(R.string.start_shortest)));
             }
         });
     }
@@ -458,7 +458,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 //manual refresh
                 sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.request_arena),getString(R.string.request_arena)));
                 return true;
-            case R.id.exploreBtn:
+            /*case R.id.exploreBtn:
                 if(menu.findItem(R.id.exploreBtn).getTitle().equals(getString(R.string.startExplore))){//hasnt start exploring
                     MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
                     sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore))+":"+maze.cp.toSingleArray()+":"+maze.direction);
@@ -472,7 +472,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 return true;
             case R.id.sspBtn:
                 sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_shortest),getString(R.string.start_shortest)));
-                return true;
+                return true;*/
             case R.id.sendTextDialogBtn:
                 final Dialog dialog = new Dialog(mContext);
                 dialog.setContentView(R.layout.sendtextlayout);
@@ -592,16 +592,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     try{
                         String [] msgArr = readMessage.split(":");
                         if(msgArr[0].equalsIgnoreCase("MAP")){
-                            String mdf1 = msgArr[1];//msgArr[3];
-                            String mdf2 = msgArr[2];//msgArr[4];
+                            String mdf1 = msgArr[1].trim();//msgArr[3];
+                            String mdf2 = msgArr[2].trim();//msgArr[4];
                             ((MazeCanvas)findViewById(R.id.maze)).updateMaze(mdf1,mdf2);
                         }else if(msgArr[0].equalsIgnoreCase("SP")){
-                            int cpcoor = Integer.parseInt(msgArr[1]);
-                            int cpdirection = Integer.parseInt(msgArr[2]);
+                            String cpcoorstr = msgArr[1].trim();
+                            String cpdirectionstr = msgArr[2].trim();
+                            int cpcoor = Integer.parseInt(cpcoorstr);
+                            int cpdirection = Integer.parseInt(cpdirectionstr);
                             ((MazeCanvas)findViewById(R.id.maze)).updateCP(cpcoor,cpdirection);
                         }
                     }catch(Exception ex){
-                        Toast.makeText(mContext,"SIAO LIAO",Toast.LENGTH_LONG).show();
+                        receiveText(ex.getMessage());
+                        //Toast.makeText(mContext,"SIAO LIAO",Toast.LENGTH_LONG).show();
                     }
 
                     /*if(readMessage.equals("")==false){

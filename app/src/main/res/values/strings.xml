@@ -27,6 +27,6 @@
     <string name="stopExplore">STOE</string>
     <string name="motion">Motion Mode</string>
     <string name="controller">Controller Mode</string>
-    <string name="startShortestPath">Start Shortest Path</string>
+    <string name="startShortestPath">SSP</string>
     <string name="sendTextDialog">Send Text</string>
 </resources>

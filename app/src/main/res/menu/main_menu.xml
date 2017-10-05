@@ -12,12 +12,12 @@
         android:id="@+id/refreshBtn"
         android:visible="false"
         android:title="@string/refresh" />
-    <item
+    <!--<item
         android:id="@+id/exploreBtn"
         android:title="@string/startExplore" />
     <item
         android:id="@+id/sspBtn"
-        android:title="@string/startShortestPath" />
+        android:title="@string/startShortestPath" />-->
     <item
         android:id="@+id/logBtn"
         android:title="@string/log" />
