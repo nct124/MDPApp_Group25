@@ -62,7 +62,15 @@ public class MazeCanvas extends View{
         p = new Paint();
         maze_info = new int[numColumns*numRows];
     }
-
+    public void reset(){
+        this.gp = CoordPair.findXY(18,13,grid_width,gap_width,numRows,numColumns);
+        this.sp = CoordPair.findXY(1,1,grid_width,gap_width,numRows,numColumns);
+        this.cp = CoordPair.findXY(1,1,grid_width,gap_width,numRows,numColumns);
+        this.wp = null;
+        this.direction = 0;
+        maze_info = new int[numColumns*numRows];
+        this.invalidate();
+    }
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);

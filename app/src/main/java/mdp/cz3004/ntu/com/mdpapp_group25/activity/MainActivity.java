@@ -12,6 +12,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
@@ -31,6 +32,14 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+
 import mdp.cz3004.ntu.com.mdpapp_group25.R;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.Constants;
 import mdp.cz3004.ntu.com.mdpapp_group25.other.MazeCanvas;
@@ -46,13 +55,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
 
+
     //Auto/Manual
     Handler updateHandler;
     boolean update = false;
+    boolean commandJustSend = false;
+    int commandSendDelay = 1000;
     int delay = 500;//millisecond
     Runnable updateRunnable;
 
     //incoming/outgoing msg
+    ArrayList<String> error;
     private ArrayAdapter<String> incomingmsg;
     private ArrayAdapter<String> outgoingmsg;
 
@@ -210,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         };
         incomingmsg = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+        error = new ArrayList<String>();
         outgoingmsg = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
         ListView incomingmsgListView = (ListView) findViewById(R.id.incomingmsg);
         incomingmsgListView.setAdapter(incomingmsg);
@@ -252,17 +266,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void sendText(String text){
-        if(mCommandService.getState()!= mCommandService.STATE_CONNECTED){
-            Toast.makeText(this,"Not Connected",Toast.LENGTH_LONG).show();
-        }else {
-            // Check that there's actually something to send
-            if(text.length() > 0) {
-                // Get the message bytes and tell the BluetoothChatService to write
-                byte[] send = text.getBytes();
-                mCommandService.write(send);
-                updateLog(text,true);
+        //if(commandJustSend==false){
+            if(mCommandService.getState()!= mCommandService.STATE_CONNECTED){
+                Toast.makeText(this,"Not Connected",Toast.LENGTH_LONG).show();
+            }else {
+                // Check that there's actually something to send
+                if(text.length() > 0) {
+                    // Get the message bytes and tell the BluetoothChatService to write
+                    byte[] send = text.getBytes();
+                    mCommandService.write(send);
+                    updateLog(text, true);
+                }
             }
-        }
+        //}
     }
     /*public void sendText(String text,boolean hex){
         if(mCommandService.getState()!= mCommandService.STATE_CONNECTED){
@@ -326,22 +342,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         xValue = sensorEvent.values[0];
         yValue = sensorEvent.values[1];
         zValue = sensorEvent.values[2];
-        if(motion){
+        if(motion&&commandJustSend==false){
             float xdiff = xValue-xValuesaved;
             float ydiff = yValue-yValuesaved;
             float zdiff = zValue-zValuesaved;
             if(xdiff<-6){//right
                 sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_right),getString(R.string.turn_right)));
                 v.vibrate(50);
+                commandJustSend = true;
             }
             if(xdiff>6){//left
                 sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.turn_left),getString(R.string.turn_left)));
                 v.vibrate(50);
+                commandJustSend = true;
             }
             if(zdiff>6){//forward
                 sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.forward),getString(R.string.forward)));
                 v.vibrate(50);
+                commandJustSend = true;
             }
+            updateHandler.postDelayed(new Runnable(){
+                public void run(){
+                    //do something
+                    commandJustSend=false;
+                }
+            },commandSendDelay);
         }
         /*xValue = sensorEvent.values[0];
         yValue = sensorEvent.values[1];
@@ -458,21 +483,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 //manual refresh
                 sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.request_arena),getString(R.string.request_arena)));
                 return true;
-            /*case R.id.exploreBtn:
-                if(menu.findItem(R.id.exploreBtn).getTitle().equals(getString(R.string.startExplore))){//hasnt start exploring
+            case R.id.exploreBtn:
+                MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
+                sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore))+":"+maze.cp.toSingleArray()+":"+maze.direction);
+                /*if(menu.findItem(R.id.exploreBtn).getTitle().equals(getString(R.string.startExplore))){//hasnt start exploring
                     MazeCanvas maze = (MazeCanvas)findViewById(R.id.maze);
                     sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore))+":"+maze.cp.toSingleArray()+":"+maze.direction);
                     menu.findItem(R.id.exploreBtn).setTitle(getString(R.string.stopExplore));
                 }else{
                     sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.stop_explore),getString(R.string.stop_explore)));
                     menu.findItem(R.id.exploreBtn).setTitle(getString(R.string.startExplore));
-                }
+                }*/
                 //menu.findItem(R.id.manualBtn).setTitle("Auto");
                 //sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore)));
                 return true;
             case R.id.sspBtn:
                 sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_shortest),getString(R.string.start_shortest)));
-                return true;*/
+                return true;
             case R.id.sendTextDialogBtn:
                 final Dialog dialog = new Dialog(mContext);
                 dialog.setContentView(R.layout.sendtextlayout);
@@ -502,8 +529,76 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 //menu.findItem(R.id.manualBtn).setTitle("Auto");
                 //sendText(getApplicationContext().getSharedPreferences(getString(R.string.mdp_key),Context.MODE_PRIVATE).getString(getString(R.string.start_explore),getString(R.string.start_explore)));
                 return true;
+            case R.id.resetBtn:
+                ((MazeCanvas)findViewById(R.id.maze)).reset();
+                writeLog();
+                writeError();
+                incomingmsg = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+                outgoingmsg = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+                error = new ArrayList<String>();
+                ListView incomingmsgListView = (ListView) findViewById(R.id.incomingmsg);
+                incomingmsgListView.setAdapter(incomingmsg);
+                ListView outgoingmsgListView = (ListView) findViewById(R.id.outgoingmsg);
+                outgoingmsgListView.setAdapter(outgoingmsg);
+
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+    private void writeLog(){
+        DateFormat df= new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+        String filename = "incoming_"+df.format(Calendar.getInstance().getTime())+".txt";
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename);
+
+        Log.d("RESET123",Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
+        Log.d("RESET123",file.getAbsolutePath());
+
+        String data = "";
+        for(int i=0;i<incomingmsg.getCount();i++){
+            data +=incomingmsg.getItem(i).toString()+"\n";
+        }
+        FileOutputStream outputStream;
+        try {
+            file.createNewFile();
+            FileOutputStream fOut = new FileOutputStream(file);
+            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+            myOutWriter.append(data);
+            myOutWriter.close();
+            fOut.flush();
+            fOut.close();
+        } catch (Exception e){
+            Toast.makeText(this,"ERROR",Toast.LENGTH_LONG).show();
+            Log.e("RESET123",e.getMessage());//e.printStackTrace();
+        }
+        Toast.makeText(this,"DONE",Toast.LENGTH_LONG).show();
+    }
+    private void writeError(){
+        if(error.size()>0){
+            DateFormat df= new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+            String filename = "error_"+df.format(Calendar.getInstance().getTime())+".txt";
+            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filename);
+
+            Log.d("RESET123",Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
+            Log.d("RESET123",file.getAbsolutePath());
+
+            String data = "";
+            for(int i=0;i<error.size();i++){
+                data +=incomingmsg.getItem(i).toString()+"\n";
+            }
+            FileOutputStream outputStream;
+            try {
+                file.createNewFile();
+                FileOutputStream fOut = new FileOutputStream(file);
+                OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+                myOutWriter.append(data);
+                myOutWriter.close();
+                fOut.flush();
+                fOut.close();
+            } catch (Exception e) {
+                Toast.makeText(this, "ERROR", Toast.LENGTH_LONG).show();
+                Log.e("RESET123", e.getMessage());//e.printStackTrace();
+            }
         }
     }
 
@@ -588,7 +683,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    receiveText(readMessage);
+
                     try{
                         String [] msgArr = readMessage.split(":");
                         if(msgArr[0].equalsIgnoreCase("MAP")){
@@ -602,13 +697,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             int cpdirection = Integer.parseInt(cpdirectionstr);
                             ((MazeCanvas)findViewById(R.id.maze)).updateCP(cpcoor,cpdirection);
                         }
+                        receiveText(readMessage);
                     }catch(Exception ex){
+                        error.add(readMessage);
+                        error.add(ex.getMessage());
+                        /*receiveText("ERROR");
+                        receiveText(readMessage);
                         receiveText(ex.getMessage());
+                        receiveText("END OF ERROR");*/
                         //Toast.makeText(mContext,"SIAO LIAO",Toast.LENGTH_LONG).show();
                     }
-
-                    /*if(readMessage.equals("")==false){
-                        String [] msgArr = readMessage.split(":");
+                    /*
+                    if(readMessage.equals("")==false){
+                        String [] msgArr = readMessage.split(",");
                         boolean fullinfo = true;
                         for(int i=0;i<msgArr.length;i++){
                             if(msgArr[i].equals("")){
@@ -616,11 +717,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                                 break;
                             }
                         }
+
                         if(fullinfo){
-                            String mdf1 = msgArr[0];//msgArr[3];
-                            String mdf2 = msgArr[1];//msgArr[4];
-                            int cpcoor = Integer.parseInt(msgArr[2]);//Integer.parseInt(msgArr[1]);
-                            int cpdirection = Integer.parseInt(msgArr[3]);//Integer.parseInt(msgArr[2]);
+                            String mdf1 = msgArr[3];//msgArr[3];
+                            String mdf2 = msgArr[4];//msgArr[4];
+                            int cpcoor = Integer.parseInt(msgArr[1]);//Integer.parseInt(msgArr[1]);
+                            int cpdirection = Integer.parseInt(msgArr[2]);//Integer.parseInt(msgArr[2]);
                             //status = msgArr[0];
                             setStatus(status);
                             //deviceListMenu.setTitle("Status: "+status+"("+mConnectedDeviceName+")");

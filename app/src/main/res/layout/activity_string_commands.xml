@@ -5,10 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="mdp.cz3004.ntu.com.mdpapp_group25.activity.StringCommandsActivity">
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:weightSum="10"
         android:layout_height="match_parent">
         <ScrollView
+            android:layout_weight="8"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <LinearLayout
@@ -164,8 +167,8 @@
         <Button
             android:id="@+id/saveSetting"
             android:text="Save"
-            android:layout_alignParentBottom="true"
+            android:layout_weight="2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-    </RelativeLayout>
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>
