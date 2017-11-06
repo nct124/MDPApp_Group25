@@ -15,4 +15,8 @@ public class Constants {
     // Key names received from the BluetoothChatService Handler
     public static final String DEVICE_NAME = "device_name";
     public static final String TOAST = "toast";
+
+    //tag for finalMDF
+    public static final String MDF1tag = "mdf1";
+    public static final String MDF2tag = "mdf2";
 }

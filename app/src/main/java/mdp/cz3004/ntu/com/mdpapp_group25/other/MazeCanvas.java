@@ -8,7 +8,6 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -50,10 +49,13 @@ public class MazeCanvas extends View{
     int obstacle = Color.BLACK;
     int wayPoint = Color.GREEN;
     int currentPoint = Color.YELLOW;
-    int currentSurrounding = Color.YELLOW;//Color.argb(0,88,216,243);
+    int currentSurrounding = Color.YELLOW;
     int robotDirection = Color.GRAY;
     int goalPoint = Color.RED;
     int startPoint = Color.BLUE;
+
+    public String mdf1 = "";//"FFC07F80FF01FE03FFFFFFF3FFE7FFCFFF9C7F38FE71FCE3F87FF0FFE1FFC3FF87FF0E0E1C1F";
+    public String mdf2 = "";//"00000100001C80000000001C0000080000060001C00000080000";
 
     Paint p;
 
@@ -76,14 +78,15 @@ public class MazeCanvas extends View{
         super.onSizeChanged(w, h, oldw, oldh);
         grid_width = (getWidth()-(gap_width*(numColumns+2)))/(numColumns+1); //(getWidth()-(gap_width*(numColumns+1)))/numColumns;
         canvas_height = (grid_width*numRows)+((numRows+2)*gap_width)+(grid_width+gap_width)-25;//(grid_width*numRows)+((numRows+1)*gap_width);
-        Log.d("SIZE",getWidth()+" "+getHeight()+" "+(grid_width*numColumns+gap_width*(numColumns+1)));
         getLayoutParams().height = canvas_height;
         this.gp = CoordPair.findXY(18,13,grid_width,gap_width,numRows,numColumns);
         this.sp = CoordPair.findXY(1,1,grid_width,gap_width,numRows,numColumns);
         this.cp = CoordPair.findXY(1,1,grid_width,gap_width,numRows,numColumns);
-
         requestLayout();
+    }
 
+    public boolean reachStartPoint(){
+        return sp.toSingleArray()==cp.toSingleArray();
     }
 
     @Override
@@ -94,10 +97,7 @@ public class MazeCanvas extends View{
         canvas.drawRect(0,0,getWidth(),getHeight(),p);
         p.setColor(Color.BLACK);
         p.setTextSize(40);
-        //canvas.drawText(Integer.toString(0),(float)50,(float)50,p);
-        int y = ((grid_width+gap_width)*numRows);//-grid_width;
-        //int yforColNum = ((grid_width+gap_width)*(numRows+1)-20);
-
+        int y = ((grid_width+gap_width)*numRows);
         for(int j=0;j<numRows;j++){
             y -=grid_width+gap_width;
             int x = -grid_width+(grid_width+gap_width);
@@ -160,7 +160,6 @@ public class MazeCanvas extends View{
                 int x = (int)event.getX();
                 int y = (int)event.getY();
                 CoordPair coor = CoordPair.findGrid(x,y,grid_width,gap_width,numRows,numColumns);
-                //Toast.makeText(getContext(),"coor:"+coor.getCol()+" "+coor.getRow(),Toast.LENGTH_LONG).show();
                 if(rgIndex==CP){
                     if (validate(coor, gp, wp, rgIndex)) {
                         tvTwo.setText("");
@@ -197,7 +196,7 @@ public class MazeCanvas extends View{
                 break;
         }
         this.invalidate();
-        return true;//super.onTouchEvent(event);
+        return true;
     }
     private boolean validate(CoordPair currentPoint, CoordPair coordPairOne, CoordPair coordPairTwo, int index) {
         if (coordPairOne != null && currentPoint.getCol() == coordPairOne.getCol() && currentPoint.getRow() == coordPairOne.getRow()) {
@@ -399,11 +398,8 @@ public class MazeCanvas extends View{
         }else{
             this.direction = direction%4;
         }
-
         int row = (coor/numColumns);
         int col = (coor%numColumns);
-
-        Log.d("CP",coor+" "+row+" "+col);
         cp = CoordPair.findXY(row,col,grid_width,gap_width,numRows,numColumns);
         for(int i=-1;i<2;i++){//row
             for(int j=-1;j<2;j++) {//col
@@ -425,7 +421,6 @@ public class MazeCanvas extends View{
         len = part2.length()*4-part2bin.length();
         for(int i=0;i<len;i++){
             part2bin = "0"+part2bin;
-            //part2bin = part2bin+"0";
         }
         maze_info = new int[numColumns*numRows];
         int j = 0; //number of bits for part2
@@ -446,5 +441,7 @@ public class MazeCanvas extends View{
             }
         }
         this.invalidate();
+        mdf1 = part1;
+        mdf2 = part2;
     }
 }

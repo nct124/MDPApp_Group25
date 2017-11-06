@@ -45,7 +45,6 @@ public class BlueToothDeviceListActivity extends AppCompatActivity {
         // Set result CANCELED incase the user backs out
         setResult(Activity.RESULT_CANCELED);
 
-
         //toolbar
         Toolbar deviceListMenu = (Toolbar) findViewById(R.id.deviceListMenu);
         deviceListMenu.setTitle("List of BlueTooth Device");
@@ -89,8 +88,6 @@ public class BlueToothDeviceListActivity extends AppCompatActivity {
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 120);
         startActivity(discoverableIntent);
-
-        //doDiscovery();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -113,21 +110,10 @@ public class BlueToothDeviceListActivity extends AppCompatActivity {
      */
     private void doDiscovery() {
         if (D) Log.d(TAG, "doDiscovery()");
-
-        // Indicate scanning in the title
-        //setTitle(R.string.scanning);
-
-        // Turn on sub-title for new devices
-        //findViewById(R.id.title_new_devices).setVisibility(View.VISIBLE);
-
         // If we're already discovering, stop it
         if (mBtAdapter.isDiscovering()) {
             mBtAdapter.cancelDiscovery();
         }
-        //Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        //discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 120);
-        //startActivity(discoverableIntent);
-
         // Request discover from BluetoothAdapter
         mBtAdapter.startDiscovery();
     }
@@ -160,17 +146,12 @@ public class BlueToothDeviceListActivity extends AppCompatActivity {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                Toast.makeText(context,"FOUND "+device.getName() + device.getAddress(),Toast.LENGTH_LONG).show();
-                // If it's already paired, skip it, because it's been listed already
-                //if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
                 mNewDevicesArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-                //}
                 // When discovery is finished, change the Activity title
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                //setTitle(R.string.select_device);
                 Toast.makeText(context,"loading done",Toast.LENGTH_LONG).show();
                 if (mNewDevicesArrayAdapter.getCount() == 0) {
-                    String noDevices = "none found";//getResources().getText(R.string.none_found).toString();
+                    String noDevices = "none found";
                     mNewDevicesArrayAdapter.add(noDevices);
                 }
             }
@@ -180,7 +161,6 @@ public class BlueToothDeviceListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //doDiscovery();
     }
 
     @Override

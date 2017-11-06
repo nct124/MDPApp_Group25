@@ -7,6 +7,7 @@
 
     <item
         android:id="@+id/manualBtn"
+        android:visible="false"
         android:title="@string/updateMode" />
     <item
         android:id="@+id/refreshBtn"
@@ -14,9 +15,11 @@
         android:title="@string/refresh" />
     <item
         android:id="@+id/exploreBtn"
+        android:visible="false"
         android:title="@string/startExplore" />
     <item
         android:id="@+id/sspBtn"
+        android:visible="false"
         android:title="@string/startShortestPath" />
     <item
         android:id="@+id/logBtn"
